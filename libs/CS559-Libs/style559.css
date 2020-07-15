@@ -1,0 +1,10 @@
+/*** Style Sheet for the 559 Tutorials ***/
+
+/** We always like to put borders around Canvas and SVG */
+canvas {
+  border: 1px solid black;
+}
+
+svg {
+  border: 1px solid black;
+}
