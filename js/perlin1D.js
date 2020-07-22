@@ -1,9 +1,10 @@
 import { onWindowOnload } from "../libs/helpers.js";
 import { Simple1DNoise } from "./perlinNoiseFunctions.js"
+import { noiseGenerator1D } from "./noiseGenerator1D.js"
 
-const numPoints = 200;
-const scale = .2;
-const amplitude = 60;
+const numPoints = 1200;
+const scale = 1;
+const amplitude = 100;
 
 let drawPerlinNoiseLine = () => {
 
@@ -35,9 +36,7 @@ let drawPerlinNoiseLine = () => {
 
     let points = [];
 
-    var generator = new Simple1DNoise();
-    generator.setScale(scale);
-    generator.setAmplitude(amplitude);
+    let generator = new noiseGenerator1D();
     for(let i=0; i<numPoints; i++) {
         points.push(generator.getVal(i));
     }
@@ -45,7 +44,7 @@ let drawPerlinNoiseLine = () => {
     context.beginPath();
     context.moveTo(-50, 300);
     for(let i=0; i<numPoints+1; i++) {
-        context.lineTo(i*length/(numPoints-1), points[i]+300);
+        context.lineTo(i*length/(numPoints-1), 600-points[i]-300);
     }
 
     context.lineTo(length+50, 300);
@@ -55,9 +54,9 @@ let drawPerlinNoiseLine = () => {
 
     styleAndDraw("LightBlue", "Blue", 1);
 
-    for(let i=0; i<numPoints+1; i++) {
-        drawDot(i*length/(numPoints-1), points[i]+300, 4, "Black");
-    }
+    // for(let i=0; i<numPoints+1; i++) {
+    //     drawDot(i*length/(numPoints-1), points[i]+300, 4, "Black");
+    // }
 };
 
 onWindowOnload(drawPerlinNoiseLine);
