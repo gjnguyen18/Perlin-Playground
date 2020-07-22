@@ -1,5 +1,4 @@
 import { onWindowOnload } from "../libs/helpers.js";
-import { Simple1DNoise } from "./perlinNoiseFunctions.js"
 import { noiseGenerator1D } from "./noiseGenerator1D.js"
 
 const numPoints = 1200;
