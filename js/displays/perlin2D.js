@@ -2,8 +2,8 @@ import { onWindowOnload } from "../../libs/helpers.js";
 import { simpleNoiseGenerator2D } from "./../noiseGenerators/simpleNoiseGenerator2D.js";
 import { perlinNoiseGenerator2D } from "./../noiseGenerators/perlinNoiseGenerator2D.js";
 
-const size = 150;
-const numSteps = 30;
+const size = 200;
+const numSteps = 20;
 
 let drawPerlinNoise2D = () => {
 

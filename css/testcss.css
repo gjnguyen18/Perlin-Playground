@@ -5,7 +5,7 @@ html {
 }
 
 .title {
-  max-width: 600px;
+  max-width: 800px;
   margin: auto;
   text-align: center;
   font-size: 50pt;
@@ -20,7 +20,7 @@ canvas {
 }
 
 .centerText {
-  max-width: 600px;
+  max-width: 800px;
   margin-left: auto;
   margin-right: auto;
   font-size: 25pt;
@@ -29,7 +29,7 @@ canvas {
 }
 
 .centerInputs {
-  max-width: 600px;
+  max-width: 800px;
   margin-left: auto;
   margin-right: auto;
   vertical-align: middle;
@@ -38,6 +38,6 @@ canvas {
 }
 
 input[type="range"] {
-  width:600px;
+  width:800px;
   vertical-align: middle;
 }

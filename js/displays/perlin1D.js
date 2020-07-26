@@ -1,7 +1,7 @@
 import { onWindowOnload } from "../../libs/helpers.js";
 import { noiseGenerator1D } from "./../noiseGenerators/noiseGenerator1D.js"
 
-const numPoints = 600;
+const numPoints = 400;
 
 let drawPerlinNoiseLine = () => {
 
