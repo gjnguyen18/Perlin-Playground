@@ -3,7 +3,7 @@ import { noiseGenerator2DSimple } from "./noiseGenerator2DSimple.js";
 
 const size = 600;
 
-let drawPerlinNoise2DBasic = () => {
+let drawRandom2D = () => {
 
     let styleAndDraw = (fillColor, strokeColor, strokeThickness) => {
         context.fillStyle = fillColor;
@@ -53,4 +53,4 @@ let drawPerlinNoise2DBasic = () => {
     }
 };
 
-onWindowOnload(drawPerlinNoise2DBasic);
+onWindowOnload(drawRandom2D);
