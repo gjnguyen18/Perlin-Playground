@@ -60,10 +60,6 @@ let drawPerlinNoiseLine = () => {
     context.closePath();
 
     styleAndDraw("LightBlue", "Blue", 1);
-
-    // for(let i=0; i<numPoints+1; i++) {
-    //     drawDot(i*length/(numPoints-1), points[i]+300, 4, "Black");
-    // }
 };
 
 onWindowOnload(drawPerlinNoiseLine);
