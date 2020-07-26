@@ -3,8 +3,8 @@ import * as T from "../../libs/CS559-THREE/build/three.module.js";
 import { onWindowOnload } from "../../libs/helpers.js";
 import { perlinNoiseGenerator2D } from "./../noiseGenerators/perlinNoiseGenerator2D.js";
 
-const numSquares = 100;
-const amplitude = 80;
+const numSquares = 50;
+const amplitude = 180;
 const terrainSize = 200;
 
 let getQuadUV = (x, y, width, height, scaleX = numSquares, scaleY = numSquares) => {
@@ -27,14 +27,16 @@ function drawPerlin2DTerrain() {
     // create surface points
     let perlinNoiseGenerator = new perlinNoiseGenerator2D();
 
-    perlinNoiseGenerator.setScale(0.05);
-    perlinNoiseGenerator.setOctaves(3);
+    perlinNoiseGenerator.setScale(0.06);
+    perlinNoiseGenerator.setOctaves(4);
 
     let meshPoints = [];
     for(let i=0; i<numSquares+1; i++) {
         let column = [];
         for(let k=0; k<numSquares+1; k++) {
-            column.push(perlinNoiseGenerator.getVal(i,k)*amplitude);
+            let result = perlinNoiseGenerator.getVal(i, k);
+            let val = Math.floor(result * 20) / 20;
+            column.push(result*amplitude);
         }
         meshPoints.push(column);
     }
@@ -52,15 +54,11 @@ function drawPerlin2DTerrain() {
     let scene = new T.Scene(); 
   
     //lighting
-    let ambientLight = new T.AmbientLight(0xffffff, 0.2);
+    let ambientLight = new T.AmbientLight(0xffffff, 0.1);
     scene.add(ambientLight);
     let pointLight = new T.PointLight(0xffffff, 1);
-    pointLight.position.set(25, 50, 25);
+    pointLight.position.set(400, 300, 400);
     scene.add(pointLight);
-  
-    camera.position.z = 100;
-    camera.position.y = 100;
-    camera.position.x = -100;
 
     let geometry = new T.Geometry();
     let material = new T.MeshStandardMaterial({ color: "lightblue" });
@@ -96,20 +94,23 @@ function drawPerlin2DTerrain() {
     terrainGroup.add(terrain);
     terrain.position.x = -terrainSize/2;
     terrain.position.z = -terrainSize/2;
-    terrain.position.y = -terrainSize*.3;
+    terrain.position.y = -amplitude/2;
 
     scene.add(terrainGroup);
 
-    camera.lookAt(0,-terrainSize*.3,0);
+    camera.position.z = 120;
+    camera.position.y = 160;
+    camera.position.x = -120;
+    camera.lookAt(0,-terrainSize*.15,0);
 
     renderer.render(scene, camera);
   
-    // function animate() {
-    //     requestAnimationFrame(animate);
-    //     terrainGroup.rotation.y += 0.01;
-    //     renderer.render(scene, camera);
-    // }
-    // animate();
+    function animate() {
+        requestAnimationFrame(animate);
+        terrainGroup.rotation.y += 0.001;
+        renderer.render(scene, camera);
+    }
+    animate();
 }
 
 onWindowOnload(drawPerlin2DTerrain);
