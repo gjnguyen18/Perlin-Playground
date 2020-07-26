@@ -4,7 +4,7 @@ export class noiseGenerator1D {
         this.seed = seed;
         this.baseScale = 0.01;
         this.baseAmplitude = 200;
-        this.octaves = 4;
+        this.octaves = 5;
 
         this.mult = 51352;
         this.inc = 581128;
@@ -34,7 +34,7 @@ export class noiseGenerator1D {
             return a + diff * step;
         }
 
-        let getRandomValue = (x, max) => {
+        let getRandomValue = (x) => {
             let getPsuedoRandomValue = (prev) => {
                 return (this.mult * prev + this.inc) % this.mod;
             }   

@@ -44,5 +44,5 @@ canvas {
 input[type="range"] {
   width:600px;
   left:600px;
-  position:fixed;
+  position:static;
 }

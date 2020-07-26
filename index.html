@@ -11,10 +11,15 @@
     </div>
 
     <div class="centerText">
-      <div> 1D Perlin Noise </div>
+      <div> 1D True Random </div>
     </div>
+    <canvas id="random1DCanvas" height="600px" width="1200px"></canvas>
+    <script src="js/random1D.js" type="module"></script>
 
-    <canvas id="canvas1" height="600px" width="1200px"></canvas>
+    <div class="centerText">
+      <div> 1D Noise </div>
+    </div>
+    <canvas id="perlin1DCanvas" height="600px" width="1200px"></canvas>
     <script src="js/perlin1D.js" type="module"></script>
 
     <div class="centerInputs">
@@ -22,5 +27,18 @@
       Base Amplitude <input type="range" min="-100" max="100" value="0" id="noise1DAmplitudeSlider"> <br>
       Octaves <input type="range" min="-100" max="100" value="0" id="noise1DOctavesSlider">
     </div>
+
+    <div class="centerText">
+      <div> 2D True Random </div>
+    </div>
+    <canvas id="random2DCanvas" height="600px" width="600px"></canvas>
+    <script src="js/random2D.js" type="module"></script>
+
+    <div class="centerText">
+      <div> Basic 2D Noise </div>
+    </div>
+    <canvas id="perlin2DSimpleCanvas" height="600px" width="600px"></canvas>
+    <script src="js/perlin2DSimple.js" type="module"></script>
+
   </body>
 </html>

@@ -1,11 +1,10 @@
 import { onWindowOnload } from "../libs/helpers.js";
-import { noiseGenerator1D } from "./noiseGenerator1D.js"
 
 const numPoints = 1200;
 const scale = 1;
 const amplitude = 100;
 
-let drawPerlinNoiseLine = () => {
+let drawRandomLine = () => {
 
     let styleAndDraw = (fillColor, strokeColor, strokeThickness) => {
         context.fillStyle = fillColor;
@@ -24,7 +23,7 @@ let drawPerlinNoiseLine = () => {
     }
 
     // gets canvas and context
-    let canvas = document.getElementById("perlin1DCanvas");
+    let canvas = document.getElementById("random1DCanvas");
     let context = canvas.getContext('2d');
 
     let length = canvas.width;
@@ -35,9 +34,8 @@ let drawPerlinNoiseLine = () => {
 
     let points = [];
 
-    let generator = new noiseGenerator1D();
     for(let i=0; i<numPoints; i++) {
-        points.push(generator.getVal(i));
+        points.push(Math.random()*400-200);
     }
 
     context.beginPath();
@@ -52,10 +50,6 @@ let drawPerlinNoiseLine = () => {
     context.closePath();
 
     styleAndDraw("LightBlue", "Blue", 1);
-
-    // for(let i=0; i<numPoints+1; i++) {
-    //     drawDot(i*length/(numPoints-1), points[i]+300, 4, "Black");
-    // }
 };
 
-onWindowOnload(drawPerlinNoiseLine);
+onWindowOnload(drawRandomLine);
