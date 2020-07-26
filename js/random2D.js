@@ -1,5 +1,4 @@
 import { onWindowOnload } from "../libs/helpers.js";
-import { noiseGenerator2DSimple } from "./noiseGenerator2DSimple.js";
 
 const size = 600;
 
