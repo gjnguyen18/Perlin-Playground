@@ -79,14 +79,7 @@ export class perlinNoiseGenerator2D {
             let finalVal = (yVal + 1) / 2;
             result += (finalVal / i);
         }
-        // return result * this.baseAmplitude / 2;
-        let val = 0;
-        for(let i=0; i<10; i++) {
-            if(result>i*.1) {
-                val += 0.1;
-            }
-        }
-        return val;
+        return result * this.baseAmplitude / 2;
         // return (Math.atan2(getRandomValue(x,y)[1],getRandomValue(x,y)[0]) / (Math.PI * 2) + 1)/2;
         // return Math.random();
     } 

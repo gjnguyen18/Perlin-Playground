@@ -25,11 +25,11 @@ let drawPerlinNoise2D = () => {
     let canvas = document.getElementById("perlin2DCanvas");
     let context = canvas.getContext('2d');
 
-    let length = canvas.width;
+    let length = canvas.width/2;
     let height = canvas.height;
 
     context.fillStyle = "White";
-    context.fillRect(0,0,length,height);
+    context.fillRect(0,0,length*2,height);
 
     let drawSquare = (x, y, val) => {
         let color = "#";
@@ -50,7 +50,15 @@ let drawPerlinNoise2D = () => {
 
     for(let i=0; i<size; i++) {
         for(let k=0; k<size; k++) {
-            drawSquare(i*length/size, k*height/size, generator.getVal(i, k));
+            let result = generator.getVal(i, k);
+            let val = 0;
+            for(let i=0; i<20; i++) {
+                if(result>i*.05) {
+                    val += 0.05;
+                }
+            }
+            drawSquare(i*length/size, k*height/size, result);
+            drawSquare(i*length/size+length, k*height/size, val);
         }
     }
 };
