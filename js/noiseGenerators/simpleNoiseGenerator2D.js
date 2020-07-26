@@ -2,7 +2,7 @@ export class simpleNoiseGenerator2D {
 
     constructor(seed = Math.random()*999999999) {
         this.seed = seed;
-        this.baseScale = 0.05;
+        this.baseScale = 0.02;
         this.baseAmplitude = 1;
         this.octaves = 3;
 

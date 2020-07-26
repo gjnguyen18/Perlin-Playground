@@ -2,9 +2,9 @@ export class perlinNoiseGenerator2D {
 
     constructor(seed = Math.random()*999999999) {
         this.seed = seed;
-        this.baseScale = 0.01;
+        this.baseScale = 0.02;
         this.baseAmplitude = 1;
-        this.octaves = 4;
+        this.octaves = 3;
 
         this.mult = 51352;
         this.inc = 581128;

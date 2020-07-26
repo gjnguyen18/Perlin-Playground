@@ -2,8 +2,6 @@ import { onWindowOnload } from "../../libs/helpers.js";
 import { noiseGenerator1D } from "./../noiseGenerators/noiseGenerator1D.js"
 
 const numPoints = 600;
-const scale = 1;
-const amplitude = 100;
 
 let drawPerlinNoiseLine = () => {
 
@@ -13,14 +11,6 @@ let drawPerlinNoiseLine = () => {
         context.strokeStyle = strokeColor;
         context.lineWidth = strokeThickness;
         context.stroke();
-    }
-
-    let drawDot = (x, y, r, color) => {
-        context.beginPath();
-        context.arc(x, y, 2, 0, Math.PI*2);
-        context.closePath();
-        context.fillStyle = color;
-        context.fill();
     }
 
     // gets canvas and context
