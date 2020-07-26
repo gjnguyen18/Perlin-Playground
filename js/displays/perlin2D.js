@@ -1,8 +1,11 @@
-import { onWindowOnload } from "../libs/helpers.js";
+import { onWindowOnload } from "../../libs/helpers.js";
+import { simpleNoiseGenerator2D } from "./../noiseGenerators/simpleNoiseGenerator2D.js";
+import { perlinNoiseGenerator2D } from "./../noiseGenerators/perlinNoiseGenerator2D.js";
+
 
 const size = 300;
 
-let drawRandom2D = () => {
+let drawPerlinNoise2D = () => {
 
     let styleAndDraw = (fillColor, strokeColor, strokeThickness) => {
         context.fillStyle = fillColor;
@@ -21,14 +24,14 @@ let drawRandom2D = () => {
     }
 
     // gets canvas and context
-    let canvas = document.getElementById("random2DCanvas");
+    let canvas = document.getElementById("perlin2DCanvas");
     let context = canvas.getContext('2d');
 
-    let length = canvas.width;
-    let height = canvas.height;
+    let length = canvas.width/2;
+    let height = canvas.height/2;
 
     context.fillStyle = "White";
-    context.fillRect(0,0,length,height);
+    context.fillRect(0,0,length*2,height*2);
 
     let drawSquare = (x, y, val) => {
         let color = "#";
@@ -45,11 +48,27 @@ let drawRandom2D = () => {
         context.fillRect(x, y, length/size, height/size);
     }
 
+    let perlinNoiseGenerator = new perlinNoiseGenerator2D();
+    let simpleNoiseGenerator = new simpleNoiseGenerator2D();
+
     for(let i=0; i<size; i++) {
         for(let k=0; k<size; k++) {
+            let result = perlinNoiseGenerator.getVal(i, k);
+            let val = Math.floor(result * 40) / 40;
+
+            // random value
             drawSquare(i*length/size, k*height/size, Math.random());
+
+            // simple noise
+            drawSquare(i*length/size+length, k*height/size, simpleNoiseGenerator.getVal(i, k));
+
+            // perlin noise
+            drawSquare(i*length/size, k*height/size+height, result);
+
+            // perlin noise with levels
+            drawSquare(i*length/size+length, k*height/size+height, val);
         }
     }
 };
 
-onWindowOnload(drawRandom2D);
+onWindowOnload(drawPerlinNoise2D);

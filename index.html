@@ -11,40 +11,39 @@
     </div>
 
     <div class="centerText">
-      <div> 1D True Random </div>
+        1D Random (Top) <br>
+        1D Noise (Bottom)
     </div>
-    <canvas id="random1DCanvas" height="600px" width="1200px"></canvas>
-    <script src="js/random1D.js" type="module"></script>
-
-    <div class="centerText">
-      <div> 1D Noise </div>
-    </div>
-    <canvas id="perlin1DCanvas" height="600px" width="1200px"></canvas>
-    <script src="js/perlin1D.js" type="module"></script>
+    <canvas id="perlin1DCanvas" height="1200px" width="1200px"></canvas>
+    <script src="js/displays/perlin1D.js" type="module"></script>
 
     <div class="centerInputs">
-      Base Scale <input type="range" min="-100" max="100" value="0" id="noise1DScaleSlider" x="600px"> <br>
-      Base Amplitude <input type="range" min="-100" max="100" value="0" id="noise1DAmplitudeSlider"> <br>
-      Octaves <input type="range" min="-100" max="100" value="0" id="noise1DOctavesSlider">
+      Base Scale <br>
+      <input type="range" min="-100" max="100" value="0" id="noise1DScaleSlider" x="600px"> <br>
+      Base Amplitude <br>
+      <input type="range" min="-100" max="100" value="0" id="noise1DAmplitudeSlider"> <br>
+      Octaves <br>
+      <input type="range" min="-100" max="100" value="0" id="noise1DOctavesSlider">
     </div>
 
     <div class="centerText">
-      <div> 2D True Random </div>
+      2D Random (Top Left) <br>
+      2D Basic Noise (Top Right) <br>
+      2D Perlin Noise (Bottom Left) <br>
+      2D Perlin Noise with Steps (Bottom Right) <br>
     </div>
-    <canvas id="random2DCanvas" height="600px" width="600px"></canvas>
-    <script src="js/random2D.js" type="module"></script>
 
-    <div class="centerText">
-      <div> Basic 2D Noise </div>
-    </div>
-    <canvas id="perlin2DSimpleCanvas" height="600px" width="600px"></canvas>
-    <script src="js/perlin2DSimple.js" type="module"></script>
+    <canvas id="perlin2DCanvas" height="1200px" width="1200px"></canvas>
+    <script src="js/displays/perlin2D.js" type="module"></script>
 
-    <div class="centerText">
-      <div> 2D Perlin Noise </div>
+    <div class="centerInputs">
+      Base Scale <br>
+      <input type="range" min="-100" max="100" value="0" id="noise2DScaleSlider" x="600px"> <br>
+      Base Amplitude <br>
+      <input type="range" min="-100" max="100" value="0" id="noise2DAmplitudeSlider"> <br>
+      Octaves <br>
+      <input type="range" min="-100" max="100" value="0" id="noise2DOctavesSlider">
     </div>
-    <canvas id="perlin2DCanvas" height="600px" width="1200px"></canvas>
-    <script src="js/perlin2D.js" type="module"></script>
 
   </body>
 </html>

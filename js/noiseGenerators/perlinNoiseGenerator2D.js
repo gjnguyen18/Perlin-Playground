@@ -4,7 +4,7 @@ export class perlinNoiseGenerator2D {
         this.seed = seed;
         this.baseScale = 0.01;
         this.baseAmplitude = 1;
-        this.octaves = 2;
+        this.octaves = 4;
 
         this.mult = 51352;
         this.inc = 581128;
