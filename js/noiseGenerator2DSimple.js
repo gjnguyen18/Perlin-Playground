@@ -13,7 +13,7 @@ export class noiseGenerator2DSimple {
         let start = (this.mult * seed + this.inc) % this.mod
 
         //pregenerated grid of values
-        this.gridSize = 2000;
+        this.gridSize = 1000;
         this.randomValues = [];
         for(let i=0; i<this.gridSize; i++) {
             let column = [];

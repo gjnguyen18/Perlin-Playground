@@ -1,8 +1,9 @@
 import { onWindowOnload } from "../libs/helpers.js";
+import { perlinNoiseGenerator2D } from "./perlinNoiseGenerator2D.js";
 
 const size = 300;
 
-let drawRandom2D = () => {
+let drawPerlinNoise2D = () => {
 
     let styleAndDraw = (fillColor, strokeColor, strokeThickness) => {
         context.fillStyle = fillColor;
@@ -21,7 +22,7 @@ let drawRandom2D = () => {
     }
 
     // gets canvas and context
-    let canvas = document.getElementById("random2DCanvas");
+    let canvas = document.getElementById("perlin2DCanvas");
     let context = canvas.getContext('2d');
 
     let length = canvas.width;
@@ -45,11 +46,13 @@ let drawRandom2D = () => {
         context.fillRect(x, y, length/size, height/size);
     }
 
+    let generator = new perlinNoiseGenerator2D();
+
     for(let i=0; i<size; i++) {
         for(let k=0; k<size; k++) {
-            drawSquare(i*length/size, k*height/size, Math.random());
+            drawSquare(i*length/size, k*height/size, generator.getVal(i, k));
         }
     }
 };
 
-onWindowOnload(drawRandom2D);
+onWindowOnload(drawPerlinNoise2D);

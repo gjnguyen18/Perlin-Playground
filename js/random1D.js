@@ -1,6 +1,6 @@
 import { onWindowOnload } from "../libs/helpers.js";
 
-const numPoints = 1200;
+const numPoints = 600;
 const scale = 1;
 const amplitude = 100;
 

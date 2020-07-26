@@ -1,5 +1,5 @@
 export class Vector {
-    static sum(v1, v2) {
+    sum(v1, v2) {
         if(v1.length != v2.length) {
             return null;
         }
@@ -10,7 +10,7 @@ export class Vector {
         return result;
     }
 
-    static difference(v1, v2) {
+    difference(v1, v2) {
         if(v1.length != v2.length) {
             return null;
         }
@@ -21,7 +21,7 @@ export class Vector {
         return result;
     }
 
-    static dot(v1, v2) {
+    dot(v1, v2) {
         if(v1.length != v2.length) {
             return null;
         }
