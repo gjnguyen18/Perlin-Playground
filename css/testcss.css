@@ -5,10 +5,10 @@ html {
 }
 
 .title {
-  max-width: 500px;
+  max-width: 600px;
   margin: auto;
   text-align: center;
-  font-size: 40pt;
+  font-size: 50pt;
 }
 
 canvas {
@@ -19,30 +19,25 @@ canvas {
   display: block;
 }
 
-  
-.testBigFont {
-  max-width: 500px;
-  margin: auto;
-  font-size: 30pt;
-  font-family: Arial, Helvetica, sans-serif;
-  font-style: oblique;
-}
-
 .centerText {
-  max-width: 500px;
+  max-width: 600px;
   margin-left: auto;
   margin-right: auto;
-  font-size: 20pt;
+  font-size: 25pt;
+  margin-top: 50px;
+  margin-bottom: 20px;
 }
 
 .centerInputs {
-  max-width: 1000px;
+  max-width: 600px;
   margin-left: auto;
   margin-right: auto;
+  vertical-align: middle;
+  font-size: 15pt;
+  margin-top: 20px;
 }
 
 input[type="range"] {
   width:600px;
-  left:600px;
-  position:static;
+  vertical-align: middle;
 }

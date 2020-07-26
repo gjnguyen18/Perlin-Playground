@@ -3,7 +3,7 @@ export class noiseGenerator1D {
     constructor(seed = Math.random()*999999999) {
         this.seed = seed;
         this.baseScale = 0.01;
-        this.baseAmplitude = 200;
+        this.baseAmplitude = 1;
         this.octaves = 5;
 
         this.mult = 51352;
@@ -14,17 +14,9 @@ export class noiseGenerator1D {
         this.randomValues = [start];
     }
 
-    setAmplitude(x) {
-        this.baseAmplitude = x;
-    }
-
-    setScale(x) {
-        this.baseScale = x;
-    }
-
-    setOctaves(x) {
-        this.octaves = x;
-    }
+    setAmplitude(x) { this.baseAmplitude = x; }
+    setScale(x) { this.baseScale = x; }
+    setOctaves(x) { this.octaves = x; }
 
     getVal(x) { 
     

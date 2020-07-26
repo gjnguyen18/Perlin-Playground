@@ -23,6 +23,10 @@ export class simpleNoiseGenerator2D {
             this.randomValues.push(column);
         }
     }
+    
+    setAmplitude(x) { this.baseAmplitude = x; }
+    setScale(x) { this.baseScale = x; }
+    setOctaves(x) { this.octaves = x; }
 
     getVal(x, y) {
         let smoothStep = (a, b, t) => {

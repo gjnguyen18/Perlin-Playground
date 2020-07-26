@@ -32,6 +32,10 @@ export class perlinNoiseGenerator2D {
         }
     }
 
+    setAmplitude(x) { this.baseAmplitude = x; }
+    setScale(x) { this.baseScale = x; }
+    setOctaves(x) { this.octaves = x; }
+
     getVal(x, y) {
         let smoothStep = (a, b, t) => {
             let step = t * t * t * (10 - 15 * t + 6 * t * t)
@@ -80,7 +84,5 @@ export class perlinNoiseGenerator2D {
             result += (finalVal / i);
         }
         return result * this.baseAmplitude / 2;
-        // return (Math.atan2(getRandomValue(x,y)[1],getRandomValue(x,y)[0]) / (Math.PI * 2) + 1)/2;
-        // return Math.random();
     } 
 }

@@ -3,7 +3,7 @@ import { simpleNoiseGenerator2D } from "./../noiseGenerators/simpleNoiseGenerato
 import { perlinNoiseGenerator2D } from "./../noiseGenerators/perlinNoiseGenerator2D.js";
 
 const size = 150;
-const numSteps = 40;
+const numSteps = 30;
 
 let drawPerlinNoise2D = () => {
 
