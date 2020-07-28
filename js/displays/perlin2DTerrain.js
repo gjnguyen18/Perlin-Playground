@@ -1,7 +1,7 @@
 
 import * as T from "../../libs/CS559-THREE/build/three.module.js";
 import { onWindowOnload } from "../../libs/helpers.js";
-import { perlinNoiseGenerator2D } from "./../noiseGenerators/perlinNoiseGenerator2D.js";
+import { PerlinNoiseGenerator2D } from "./../noiseGenerators/perlinNoiseGenerator2D.js";
 
 const numSquares = 50;
 const amplitude = 180;
@@ -25,7 +25,7 @@ let getQuadUV = (x, y, width, height, scaleX = numSquares, scaleY = numSquares) 
 function drawPerlin2DTerrain() {
 
     // create surface points
-    let perlinNoiseGenerator = new perlinNoiseGenerator2D();
+    let perlinNoiseGenerator = new PerlinNoiseGenerator2D();
 
     perlinNoiseGenerator.setScale(0.06);
     perlinNoiseGenerator.setOctaves(4);

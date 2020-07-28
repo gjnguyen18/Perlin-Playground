@@ -1,5 +1,5 @@
 import { onWindowOnload } from "../../libs/helpers.js";
-import { noiseGenerator1D } from "./../noiseGenerators/noiseGenerator1D.js"
+import { NoiseGenerator1D } from "./../noiseGenerators/noiseGenerator1D.js"
 
 const numPoints = 400;
 
@@ -43,7 +43,7 @@ let drawPerlinNoiseLine = () => {
     // 1d noise
     let points = [];
 
-    let generator = new noiseGenerator1D();
+    let generator = new NoiseGenerator1D();
     for(let i=0; i<numPoints; i++) {
         points.push(generator.getVal(i)*height*.3);
     }

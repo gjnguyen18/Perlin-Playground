@@ -1,4 +1,4 @@
-export class noiseGenerator1D {
+export class NoiseGenerator1D {
 
     constructor(seed = Math.random()*999999999) {
         this.seed = seed;

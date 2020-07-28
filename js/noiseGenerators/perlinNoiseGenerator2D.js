@@ -1,38 +1,40 @@
-export class perlinNoiseGenerator2D {
+import { RandomGenerator } from "../tools/random.js";
 
-    constructor(seed = Math.random()*999999999) {
+export class PerlinNoiseGenerator2D {
+
+    constructor(seed = Math.floor((Math.random()*999999999))) {
         this.seed = seed;
         this.baseScale = 0.02;
-        this.baseAmplitude = 1;
         this.octaves = 3;
 
         this.mult = 51352;
         this.inc = 581128;
         this.mod = 941203;
 
-        let start = (this.mult * seed + this.inc) % this.mod
+        this.randomGenerator = new RandomGenerator(this.seed);
 
-        let generateRandomVector2D = () => {
-            let angle = Math.random() * 2 * Math.PI;
+        console.log(seed);
+
+        let generateVector2D = (ang) => {
+            let angle = ang * 2 * Math.PI;
             let x = Math.cos(angle);
             let y = Math.sin(angle);
             return [x,y];
         }
 
         //pregenerated grid of values
-        this.gridSize = 1000;
+        this.gridSize = 2000;
         this.randomValues = [];
         for(let i=0; i<this.gridSize; i++) {
             let column = [];
             for(let k=0; k<this.gridSize; k++) {
-                let vector2D = generateRandomVector2D();
+                let vector2D = generateVector2D(this.randomGenerator.random());
                 column.push(vector2D);
             }
             this.randomValues.push(column);
         }
     }
 
-    setAmplitude(x) { this.baseAmplitude = x; }
     setScale(x) { this.baseScale = x; }
     setOctaves(x) { this.octaves = x; }
 
@@ -59,6 +61,7 @@ export class perlinNoiseGenerator2D {
         }
 
         let result = 0;
+        let max = 0;
         for(let i=1; i<=this.octaves; i++) {
             let scaledX = (x + Math.pow((this.seed % 10),i)) * this.baseScale * i;
             let scaledY = (y + Math.pow((this.seed % 10),i)) * this.baseScale * i;
@@ -81,8 +84,9 @@ export class perlinNoiseGenerator2D {
 
             let yVal = smoothStep(xVal1, xVal2, ty);
             let finalVal = (yVal + 1) / 2;
-            result += (finalVal / i);
+            result += (finalVal / Math.pow(2,i-1));
+            max += 1 / Math.pow(2,i-1);
         }
-        return result * this.baseAmplitude / 2;
+        return result / max;
     } 
 }

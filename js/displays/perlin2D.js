@@ -1,9 +1,9 @@
 import { onWindowOnload } from "../../libs/helpers.js";
-import { simpleNoiseGenerator2D } from "./../noiseGenerators/simpleNoiseGenerator2D.js";
-import { perlinNoiseGenerator2D } from "./../noiseGenerators/perlinNoiseGenerator2D.js";
+import { SimpleNoiseGenerator2D } from "./../noiseGenerators/simpleNoiseGenerator2D.js";
+import { PerlinNoiseGenerator2D } from "./../noiseGenerators/perlinNoiseGenerator2D.js";
 
-const size = 200;
-const numSteps = 20;
+var size = 200;
+var numSteps = 20;
 
 let drawPerlinNoise2D = () => {
 
@@ -32,26 +32,49 @@ let drawPerlinNoise2D = () => {
         context.fillRect(x, y, length/size, height/size);
     }
 
-    let perlinNoiseGenerator = new perlinNoiseGenerator2D();
-    let simpleNoiseGenerator = new simpleNoiseGenerator2D();
+    let perlinNoiseGenerator = new PerlinNoiseGenerator2D();
+    let simpleNoiseGenerator = new SimpleNoiseGenerator2D();
 
-    for(let i=0; i<size; i++) {
-        for(let k=0; k<size; k++) {
-            let result = perlinNoiseGenerator.getVal(i, k);
-            let val = Math.floor(result * numSteps) / numSteps;
+    let drawCanvas = () => {
+        for(let i=0; i<size; i++) {
+            for(let k=0; k<size; k++) {
+                let result = perlinNoiseGenerator.getVal(i, k);
+                let val = Math.floor(result * numSteps) / numSteps;
 
-            // random value
-            drawSquare(i*length/size, k*height/size, Math.random());
+                // random value
+                drawSquare(i*length/size, k*height/size, Math.random());
 
-            // simple noise
-            drawSquare(i*length/size+length, k*height/size, simpleNoiseGenerator.getVal(i, k));
+                // simple noise
+                drawSquare(i*length/size+length, k*height/size, simpleNoiseGenerator.getVal(i, k));
 
-            // perlin noise
-            drawSquare(i*length/size, k*height/size+height, result);
+                // perlin noise
+                drawSquare(i*length/size, k*height/size+height, result);
 
-            // perlin noise with levels
-            drawSquare(i*length/size+length, k*height/size+height, val);
+                // perlin noise with levels
+                drawSquare(i*length/size+length, k*height/size+height, val);
+            }
         }
+    }
+    drawCanvas();
+
+    let scaleSlider = /** @type {HTMLInputElement} */ (document.getElementById("noise2DScaleSlider"));
+    scaleSlider.onchange = () => {
+        perlinNoiseGenerator.setScale(Number(scaleSlider.value));
+        simpleNoiseGenerator.setScale(Number(scaleSlider.value));
+        drawCanvas();
+    }
+    
+    let octavesSlider = /** @type {HTMLInputElement} */ (document.getElementById("noise2DOctavesSlider"));
+    octavesSlider.onchange = () => {
+        perlinNoiseGenerator.setOctaves(Number(octavesSlider.value));
+        simpleNoiseGenerator.setOctaves(Number(octavesSlider.value));
+        drawCanvas();
+    }
+
+    let stepsSlider = /** @type {HTMLInputElement} */ (document.getElementById("noise2DStepsSlider"));
+    stepsSlider.onchange = () => {
+        numSteps = Number(stepsSlider.value);
+        drawCanvas();
     }
 };
 
