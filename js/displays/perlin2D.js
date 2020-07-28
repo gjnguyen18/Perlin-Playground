@@ -57,7 +57,64 @@ let drawPerlinNoise2D = () => {
     }
     drawCanvas();
 
+    let resolutionSlider = /** @type {HTMLInputElement} */ (document.getElementById("noise2DResolution"));
+    resolutionSlider.oninput = () => {
+        let res = Number(resolutionSlider.value);
+        switch(res) {
+            case 0:
+                size = 25
+            break;
+            case 1:
+                size = 50;
+            break;
+            case 2:
+                size = 100;
+            break;
+            case 3:
+                size = 200;
+            break;
+            case 4:
+                size = 400;
+            break;
+            case 5:
+                size = 800;
+            break;
+            default:
+                size = 200;
+        }
+        document.getElementById("resNum").innerHTML = size + " x " + size;
+    }
+    resolutionSlider.onchange = () => {
+        let res = Number(resolutionSlider.value);
+        switch(res) {
+            case 0:
+                size = 25
+            break;
+            case 1:
+                size = 50;
+            break;
+            case 2:
+                size = 100;
+            break;
+            case 3:
+                size = 200;
+            break;
+            case 4:
+                size = 400;
+            break;
+            case 5:
+                size = 800;
+            break;
+            default:
+                size = 200;
+        }
+        drawCanvas();
+    }
+
     let scaleSlider = /** @type {HTMLInputElement} */ (document.getElementById("noise2DScaleSlider"));
+    scaleSlider.oninput = () => {
+        document.getElementById("scaleNum").innerHTML = Number(scaleSlider.value);
+    }
     scaleSlider.onchange = () => {
         perlinNoiseGenerator.setScale(Number(scaleSlider.value));
         simpleNoiseGenerator.setScale(Number(scaleSlider.value));
@@ -65,6 +122,9 @@ let drawPerlinNoise2D = () => {
     }
     
     let octavesSlider = /** @type {HTMLInputElement} */ (document.getElementById("noise2DOctavesSlider"));
+    octavesSlider.oninput = () => {
+        document.getElementById("octavesNum").innerHTML = Number(octavesSlider.value);
+    }
     octavesSlider.onchange = () => {
         perlinNoiseGenerator.setOctaves(Number(octavesSlider.value));
         simpleNoiseGenerator.setOctaves(Number(octavesSlider.value));
@@ -72,6 +132,9 @@ let drawPerlinNoise2D = () => {
     }
 
     let stepsSlider = /** @type {HTMLInputElement} */ (document.getElementById("noise2DStepsSlider"));
+    stepsSlider.oninput = () => {
+        document.getElementById("stepsNum").innerHTML = Number(stepsSlider.value);
+    }
     stepsSlider.onchange = () => {
         numSteps = Number(stepsSlider.value);
         drawCanvas();
