@@ -42,8 +42,8 @@ export class SimpleNoiseGenerator2D {
         let result = 0;
         let max = 0;
         for(let i=1; i<=this.octaves; i++) {
-            let scaledX = (x + Math.pow((this.seed % 10),i)) * this.baseScale * i;
-            let scaledY = (y + Math.pow((this.seed % 10),i)) * this.baseScale * i;
+            let scaledX = x * this.baseScale * i + Math.pow((this.seed % 10),i);
+            let scaledY = y * this.baseScale * i + Math.pow((this.seed % 10),i);
 
             let xFloor = Math.floor(scaledX);
             let xCeil = Math.ceil(scaledX);

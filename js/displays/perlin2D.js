@@ -3,7 +3,9 @@ import { SimpleNoiseGenerator2D } from "./../noiseGenerators/simpleNoiseGenerato
 import { PerlinNoiseGenerator2D } from "./../noiseGenerators/perlinNoiseGenerator2D.js";
 
 var size = 200;
+var scale = 0.02;
 var numSteps = 20;
+var autoAdjustScale = true;
 
 let drawPerlinNoise2D = () => {
 
@@ -34,6 +36,10 @@ let drawPerlinNoise2D = () => {
 
     let perlinNoiseGenerator = new PerlinNoiseGenerator2D();
     let simpleNoiseGenerator = new SimpleNoiseGenerator2D();
+
+    let scaleSlider = /** @type {HTMLInputElement} */ (document.getElementById("noise2DScaleSlider"));
+
+    let lastSize = size;
 
     let drawCanvas = () => {
         for(let i=0; i<size; i++) {
@@ -76,16 +82,13 @@ let drawPerlinNoise2D = () => {
             case 4:
                 size = 400;
             break;
-            case 5:
-                size = 800;
-            break;
             default:
                 size = 200;
         }
         document.getElementById("resNum").innerHTML = size + " x " + size;
     }
     resolutionSlider.onchange = () => {
-        let res = Number(resolutionSlider.value);
+        let res = Number(resolutionSlider.value);;
         switch(res) {
             case 0:
                 size = 25
@@ -108,10 +111,20 @@ let drawPerlinNoise2D = () => {
             default:
                 size = 200;
         }
+        if(autoAdjustScale) {
+            let ratio = size / lastSize;
+            console.log(ratio);
+            let curScale = Number(scaleSlider.value);
+            let newScale = curScale / ratio;
+            scaleSlider.value = newScale;
+            perlinNoiseGenerator.setScale(newScale);
+            simpleNoiseGenerator.setScale(newScale);
+            document.getElementById("scaleNum").innerHTML = newScale;
+        }
+        lastSize = size;
         drawCanvas();
     }
 
-    let scaleSlider = /** @type {HTMLInputElement} */ (document.getElementById("noise2DScaleSlider"));
     scaleSlider.oninput = () => {
         document.getElementById("scaleNum").innerHTML = Number(scaleSlider.value);
     }
