@@ -2,7 +2,7 @@ import { RandomGenerator } from "../tools/random.js";
 
 export class SimpleNoiseGenerator2D {
 
-    constructor(seed = Math.random()*999999999) {
+    constructor(seed = Math.floor(Math.random()*999999999)) {
         this.seed = seed;
         this.baseScale = 0.02;
         this.octaves = 3;
@@ -57,7 +57,7 @@ export class SimpleNoiseGenerator2D {
             let xVal2 = smoothStep(getRandomValue(xFloor, yCeil), getRandomValue(xCeil, yCeil), tx);
 
             let finalVal = smoothStep(xVal1, xVal2, ty);
-            result += (finalVal / Math.pow(2,i-1));
+            result += finalVal / Math.pow(2,i-1);
             max += 1 / Math.pow(2,i-1);
         }
         return result / max;

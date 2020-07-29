@@ -13,8 +13,6 @@ export class PerlinNoiseGenerator2D {
 
         this.randomGenerator = new RandomGenerator(this.seed);
 
-        console.log(seed);
-
         let generateVector2D = (ang) => {
             let angle = ang * 2 * Math.PI;
             let x = Math.cos(angle);
@@ -84,7 +82,7 @@ export class PerlinNoiseGenerator2D {
 
             let yVal = smoothStep(xVal1, xVal2, ty);
             let finalVal = (yVal + 1) / 2;
-            result += (finalVal / Math.pow(2,i-1));
+            result += finalVal / Math.pow(2,i-1);
             max += 1 / Math.pow(2,i-1);
         }
         return result / max;

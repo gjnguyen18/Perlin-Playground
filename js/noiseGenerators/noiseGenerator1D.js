@@ -1,20 +1,18 @@
+import { RandomGenerator } from "../tools/random.js";
+
 export class NoiseGenerator1D {
 
-    constructor(seed = Math.random()*999999999) {
+    constructor(seed = Math.floor(Math.random()*999999999)) {
         this.seed = seed;
-        this.baseScale = 0.01;
-        this.baseAmplitude = 1;
-        this.octaves = 5;
+        this.baseScale = 0.02;
+        this.octaves = 3;
 
-        this.mult = 51352;
-        this.inc = 581128;
-        this.mod = 941203;
+        this.randomGenerator = new RandomGenerator(this.seed);
 
         let start = (this.mult * seed + this.inc) % this.mod
         this.randomValues = [start];
     }
 
-    setAmplitude(x) { this.baseAmplitude = x; }
     setScale(x) { this.baseScale = x; }
     setOctaves(x) { this.octaves = x; }
 
@@ -27,24 +25,23 @@ export class NoiseGenerator1D {
         }
 
         let getRandomValue = (x) => {
-            let getPsuedoRandomValue = (prev) => {
-                return (this.mult * prev + this.inc) % this.mod;
-            }   
             while(this.randomValues.length <= x) {
-                this.randomValues.push(getPsuedoRandomValue(this.randomValues[this.randomValues.length-1]));
+                this.randomValues.push(this.randomGenerator.random());
             }
-            return (this.randomValues[x] / this.mod);
+            return this.randomValues[x];
         }
 
         let result = 0;
+        let max = 0;
         for(let i=1; i<=this.octaves; i++) {
-            let scaledX = (x + Math.pow((this.seed % 10),i)) * this.baseScale * i;
+            let scaledX = x * this.baseScale * i + + Math.pow((this.seed % 10),i);
             let xFloor = Math.floor(scaledX);
             let xCeil = Math.ceil(scaledX);
             let t = scaledX - xFloor;
             let val = smoothStep(getRandomValue(xFloor), getRandomValue(xCeil), t);
-            result += (val * this.baseAmplitude / i) - (this.baseAmplitude / (2 * i));
+            result += val / Math.pow(2, i-1);
+            max += 1 / Math.pow(2,i-1);
         }
-        return result;
+        return result / max;
     }
 }

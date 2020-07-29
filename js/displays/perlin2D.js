@@ -5,7 +5,7 @@ import { PerlinNoiseGenerator2D } from "./../noiseGenerators/perlinNoiseGenerato
 var size = 200;
 var scale = 0.02;
 var numSteps = 20;
-var autoAdjustScale = true;
+var seed = 0;
 
 let drawPerlinNoise2D = () => {
 
@@ -34,12 +34,9 @@ let drawPerlinNoise2D = () => {
         context.fillRect(x, y, length/size, height/size);
     }
 
-    let perlinNoiseGenerator = new PerlinNoiseGenerator2D();
-    let simpleNoiseGenerator = new SimpleNoiseGenerator2D();
-
-    let scaleSlider = /** @type {HTMLInputElement} */ (document.getElementById("noise2DScaleSlider"));
-
-    let lastSize = size;
+    seed = (Math.floor(Math.random()*9)+1)*100000000 + Math.floor(Math.random()*99999999);
+    let perlinNoiseGenerator = new PerlinNoiseGenerator2D(seed);
+    let simpleNoiseGenerator = new SimpleNoiseGenerator2D(seed);
 
     let drawCanvas = () => {
         for(let i=0; i<size; i++) {
@@ -61,9 +58,33 @@ let drawPerlinNoise2D = () => {
             }
         }
     }
+
     drawCanvas();
 
-    let resolutionSlider = /** @type {HTMLInputElement} */ (document.getElementById("noise2DResolution"));
+    let seedBox = /** @type {HTMLInputElement} */ (document.getElementById("seedBox"));
+    let seedWarning = /** @type {HTMLInputElement} */ (document.getElementById("seedWarning"));
+    let resolutionSlider = /** @type {HTMLInputElement} */ (document.getElementById("noise2DResolutionSlider"));
+    let autoAdjustScaleCheck = /** @type {HTMLInputElement} */ (document.getElementById("autoAdjustScaleCheck"));
+    let scaleSlider = /** @type {HTMLInputElement} */ (document.getElementById("noise2DScaleSlider"));
+    let octavesSlider = /** @type {HTMLInputElement} */ (document.getElementById("noise2DOctavesSlider"));
+    let stepsSlider = /** @type {HTMLInputElement} */ (document.getElementById("noise2DStepsSlider"));
+
+    let lastSize = size;
+
+    seedBox.value = seed;
+    seedBox.onchange = () => {
+        if(Number(seedBox.value) < 0 || Number(seedBox.value) > 999999999) {
+            seedWarning.innerHTML = "Seed must be between 1 and 999999999 inclusive";
+        }
+        else {
+            seed = Number(seedBox.value)
+            perlinNoiseGenerator = new PerlinNoiseGenerator2D(seed);
+            simpleNoiseGenerator = new SimpleNoiseGenerator2D(seed);
+            drawCanvas();
+            seedWarning.innerHTML = "";
+        }
+    }
+
     resolutionSlider.oninput = () => {
         let res = Number(resolutionSlider.value);
         switch(res) {
@@ -111,7 +132,7 @@ let drawPerlinNoise2D = () => {
             default:
                 size = 200;
         }
-        if(autoAdjustScale) {
+        if(autoAdjustScaleCheck.checked) {
             let ratio = size / lastSize;
             console.log(ratio);
             let curScale = Number(scaleSlider.value);
@@ -134,7 +155,6 @@ let drawPerlinNoise2D = () => {
         drawCanvas();
     }
     
-    let octavesSlider = /** @type {HTMLInputElement} */ (document.getElementById("noise2DOctavesSlider"));
     octavesSlider.oninput = () => {
         document.getElementById("octavesNum").innerHTML = Number(octavesSlider.value);
     }
@@ -144,7 +164,6 @@ let drawPerlinNoise2D = () => {
         drawCanvas();
     }
 
-    let stepsSlider = /** @type {HTMLInputElement} */ (document.getElementById("noise2DStepsSlider"));
     stepsSlider.oninput = () => {
         document.getElementById("stepsNum").innerHTML = Number(stepsSlider.value);
     }

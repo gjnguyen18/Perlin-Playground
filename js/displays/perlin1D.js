@@ -1,9 +1,11 @@
 import { onWindowOnload } from "../../libs/helpers.js";
 import { NoiseGenerator1D } from "./../noiseGenerators/noiseGenerator1D.js"
 
-const numPoints = 400;
+var numPoints = 400;
+var amplitude = 200;
+var seed = 0;
 
-let drawPerlinNoiseLine = () => {
+let drawNoiseLine = () => {
 
     let styleAndDraw = (fillColor, strokeColor, strokeThickness) => {
         context.fillStyle = fillColor;
@@ -20,46 +22,112 @@ let drawPerlinNoiseLine = () => {
     let length = canvas.width;
     let height = canvas.height/2;
 
-    context.fillStyle = "White";
-    context.fillRect(0,0,length,height);
+    seed = (Math.floor(Math.random()*9)+1)*100000000 + Math.floor(Math.random()*99999999);
+    let generator = new NoiseGenerator1D(seed);
 
-    // random line
-    context.beginPath();
-    context.moveTo(-50, height/2);
-    for(let i=0; i<numPoints+1; i++) {
-        context.lineTo(i*length/(numPoints-1), height-(Math.random()*height*.6-height*.3)-height/2);
+    let drawCanvas = () => {
+        context.fillStyle = "White";
+        context.fillRect(0,0,length,height);
+
+        // random line
+        context.beginPath();
+        context.moveTo(-50, height/2);
+        for(let i=0; i<numPoints+1; i++) {
+            let curVal = Math.random();
+            context.lineTo(i*length/(numPoints-1), height * 0.5 + curVal * amplitude - amplitude / 2);
+        }
+
+        context.lineTo(length+50, height/2);
+        context.lineTo(length+50, height+50);
+        context.lineTo(-50, height+50);
+        context.closePath();
+
+        styleAndDraw("LightBlue", "Blue", 1);
+
+        context.fillStyle = "White";
+        context.fillRect(0,height,length,height);
+
+        // 1d noise
+
+        context.beginPath();
+        context.moveTo(-50, height/2 + height);
+        for(let i=0; i<numPoints+1; i++) {
+            context.lineTo(i*length/(numPoints-1), height * 1.5 + generator.getVal(i) * amplitude - amplitude / 2);
+        }
+
+        context.lineTo(length+50, height/2 + height);
+        context.lineTo(length+50, height+50 + height);
+        context.lineTo(-50, height+50 + height);
+        context.closePath();
+
+        styleAndDraw("LightBlue", "Blue", 1);
     }
 
-    context.lineTo(length+50, height/2);
-    context.lineTo(length+50, height+50);
-    context.lineTo(-50, height+50);
-    context.closePath();
+    drawCanvas();
 
-    styleAndDraw("LightBlue", "Blue", 1);
+    let lastSize = numPoints;
 
-    context.fillStyle = "White";
-    context.fillRect(0,height,length,height);
+    let seedBox = /** @type {HTMLInputElement} */ (document.getElementById("1DseedBox"));
+    let seedWarning = /** @type {HTMLInputElement} */ (document.getElementById("1DseedWarning"));
+    let numPointsSlider = /** @type {HTMLInputElement} */ (document.getElementById("noise1DNumPointsSlider"));
+    let autoAdjustScaleCheck = /** @type {HTMLInputElement} */ (document.getElementById("1DAutoAdjustScaleCheck"));
+    let scaleSlider = /** @type {HTMLInputElement} */ (document.getElementById("noise1DScaleSlider"));
+    let amplitudeSlider = /** @type {HTMLInputElement} */ (document.getElementById("noise1DAmplitudeSlider"));
+    let octavesSlider = /** @type {HTMLInputElement} */ (document.getElementById("noise1DOctavesSlider"));
 
-    // 1d noise
-    let points = [];
-
-    let generator = new NoiseGenerator1D();
-    for(let i=0; i<numPoints; i++) {
-        points.push(generator.getVal(i)*height*.3);
+    seedBox.value = seed;
+    seedBox.onchange = () => {
+        if(Number(seedBox.value) < 0 || Number(seedBox.value) > 999999999) {
+            seedWarning.innerHTML = "Seed must be between 1 and 999999999 inclusive";
+        }
+        else {
+            seed = Number(seedBox.value)
+            generator = new NoiseGenerator1D(seed);
+            drawCanvas();
+            seedWarning.innerHTML = "";
+        }
     }
 
-    context.beginPath();
-    context.moveTo(-50, height/2 + height);
-    for(let i=0; i<numPoints+1; i++) {
-        context.lineTo(i*length/(numPoints-1), height-points[i]-(height/2) + height);
+    numPointsSlider.oninput = () => {
+        document.getElementById("1DNumPointsTag").innerHTML = Number(numPointsSlider.value);
+    }
+    numPointsSlider.onchange = () => {
+        numPoints = Number(numPointsSlider.value);
+        if(autoAdjustScaleCheck.checked) {
+            let ratio = numPoints / lastSize;
+            let curScale = Number(scaleSlider.value);
+            let newScale = curScale / ratio;
+            scaleSlider.value = newScale;
+            generator.setScale(newScale);
+            document.getElementById("1DScaleTag").innerHTML = newScale;
+        }
+        lastSize = numPoints;
+        drawCanvas();
     }
 
-    context.lineTo(length+50, height/2 + height);
-    context.lineTo(length+50, height+50 + height);
-    context.lineTo(-50, height+50 + height);
-    context.closePath();
+    scaleSlider.oninput = () => {
+        document.getElementById("1DScaleTag").innerHTML = Number(scaleSlider.value);
+    }
+    scaleSlider.onchange = () => {
+        generator.setScale(Number(scaleSlider.value));
+        drawCanvas();
+    }
 
-    styleAndDraw("LightBlue", "Blue", 1);
+    amplitudeSlider.oninput = () => {
+        document.getElementById("1DAmplitudeTag").innerHTML = Number(amplitudeSlider.value);
+    }
+    amplitudeSlider.onchange = () => {
+        amplitude = Number(amplitudeSlider.value);
+        drawCanvas();
+    }
+
+    octavesSlider.oninput = () => {
+        document.getElementById("1DOctavesTag").innerHTML = Number(octavesSlider.value);
+    }
+    octavesSlider.onchange = () => {
+        generator.setOctaves(Number(octavesSlider.value));
+        drawCanvas();
+    }
 };
 
-onWindowOnload(drawPerlinNoiseLine);
+onWindowOnload(drawNoiseLine);
