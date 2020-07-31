@@ -19,13 +19,13 @@ export class PerlinNoiseGenerator3D {
         }
 
         //pregenerated grid of values
-        this.gridSize = 2000;
+        this.gridSize = 200;
         this.randomValues = [];
         for(let i=0; i<this.gridSize; i++) {
             let column = [];
             for(let k=0; k<this.gridSize; k++) {
                 let row = [];
-                for(let k=0; k<this.gridSize; k++) {
+                for(let j=0; j<this.gridSize; j++) {
                     let vector3D = generateVector3D(this.randomGenerator.random(), this.randomGenerator.random());
                     row.push(vector3D);
                 }

@@ -17,7 +17,7 @@ export class PerlinNoiseGenerator2D {
         }
 
         //pregenerated grid of values
-        this.gridSize = 2000;
+        this.gridSize = 500;
         this.randomValues = [];
         for(let i=0; i<this.gridSize; i++) {
             let column = [];

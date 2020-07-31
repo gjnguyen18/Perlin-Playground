@@ -45,7 +45,7 @@ function drawPerlin2DTerrain() {
     let camera = new T.PerspectiveCamera(50, 1, 0.1, 1000);
     let scene = new T.Scene(); 
 
-    let drawBlocks = () => {
+    let createGeometry = () => {
         let geometry = new T.Geometry();
         let drawSquare = (p1, p2, p3, p4) => {
             geometry.faces.push(new T.Face3(p4, p2, p1));
@@ -110,7 +110,7 @@ function drawPerlin2DTerrain() {
         let material = new T.MeshLambertMaterial({ color: "lightblue" });
 
         getPoints();
-        let geometry = drawBlocks();
+        let geometry = createGeometry();
         
         geometry.computeFaceNormals();
 

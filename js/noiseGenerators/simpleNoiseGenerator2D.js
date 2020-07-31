@@ -10,7 +10,7 @@ export class SimpleNoiseGenerator2D {
         this.randomGenerator = new RandomGenerator(this.seed);
 
         //pregenerated grid of values
-        this.gridSize = 1000;
+        this.gridSize = 500;
         this.randomValues = [];
         for(let i=0; i<this.gridSize; i++) {
             let column = [];
