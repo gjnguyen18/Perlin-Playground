@@ -80,6 +80,10 @@ let drawPerlinNoise2D = () => {
             seed = Number(seedBox.value)
             perlinNoiseGenerator = new PerlinNoiseGenerator2D(seed);
             simpleNoiseGenerator = new SimpleNoiseGenerator2D(seed);
+            perlinNoiseGenerator.setScale(Number(scaleSlider.value));
+            perlinNoiseGenerator.setOctaves(Number(octavesSlider.value));
+            simpleNoiseGenerator.setScale(Number(scaleSlider.value));
+            simpleNoiseGenerator.setOctaves(Number(octavesSlider.value));
             drawCanvas();
             seedWarning.innerHTML = "";
         }

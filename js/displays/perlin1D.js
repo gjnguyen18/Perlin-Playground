@@ -83,6 +83,8 @@ let drawNoiseLine = () => {
         else {
             seed = Number(seedBox.value)
             generator = new NoiseGenerator1D(seed);
+            generator.setScale(Number(scaleSlider.value));
+            generator.setOctaves(Number(octavesSlider.value));
             drawCanvas();
             seedWarning.innerHTML = "";
         }
