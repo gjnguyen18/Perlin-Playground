@@ -7,10 +7,6 @@ export class SimpleNoiseGenerator2D {
         this.baseScale = 0.02;
         this.octaves = 3;
 
-        this.mult = 51352;
-        this.inc = 581128;
-        this.mod = 941203;
-
         this.randomGenerator = new RandomGenerator(this.seed);
 
         //pregenerated grid of values

@@ -9,20 +9,20 @@ const terrainSize = 400;
 
 var seed = 0;
 
-let getQuadUV = (x, y, width, height, scaleX = numSquares, scaleY = numSquares) => {
-    return [
-        [
-            new T.Vector2(x / scaleX, y / scaleY),
-            new T.Vector2((x + width) / scaleX, (y + height) / scaleY),
-            new T.Vector2((x + width) / scaleX, y / scaleY)
-        ],
-        [
-            new T.Vector2(x / scaleX, y / scaleY),
-            new T.Vector2(x / scaleX, (y + height) / scaleY),
-            new T.Vector2((x + width) / scaleX, (y + height) / scaleY)
-        ]
-    ]
-}
+// let getQuadUV = (x, y, width, height, scaleX = numSquares, scaleY = numSquares) => {
+//     return [
+//         [
+//             new T.Vector2(x / scaleX, y / scaleY),
+//             new T.Vector2((x + width) / scaleX, (y + height) / scaleY),
+//             new T.Vector2((x + width) / scaleX, y / scaleY)
+//         ],
+//         [
+//             new T.Vector2(x / scaleX, y / scaleY),
+//             new T.Vector2(x / scaleX, (y + height) / scaleY),
+//             new T.Vector2((x + width) / scaleX, (y + height) / scaleY)
+//         ]
+//     ]
+// }
 
 function drawPerlin2DTerrain() {
 
@@ -87,28 +87,28 @@ function drawPerlin2DTerrain() {
 
         for(let i=0; i<numSquares+1; i++) {
             for(let k=0; k<numSquares+1; k++) {
-                geometry.vertices.push(new T.Vector3(k*terrainSize/numSquares, meshPoints[i][k], i*terrainSize/numSquares));
+                geometry.vertices.push(new T.Vector3(i*terrainSize/numSquares, meshPoints[i][k], k*terrainSize/numSquares));
             }
         }
 
         for(let i=0; i<numSquares; i++) {
             for(let k=0; k<numSquares; k++) {
-                geometry.faces.push(new T.Face3(i*(numSquares+1)+k, (i+1)*(numSquares+1)+k+1, i*(numSquares+1)+k+1));
-                geometry.faces.push(new T.Face3(i*(numSquares+1)+k, (i+1)*(numSquares+1)+k, (i+1)*(numSquares+1)+k+1));
+                geometry.faces.push(new T.Face3(i*(numSquares+1)+k+1, (i+1)*(numSquares+1)+k+1, i*(numSquares+1)+k));
+                geometry.faces.push(new T.Face3((i+1)*(numSquares+1)+k+1, (i+1)*(numSquares+1)+k, i*(numSquares+1)+k));
             }
         }
 
-        geometry.faceVertexUvs = [[]];
+        // geometry.faceVertexUvs = [[]];
         geometry.computeFaceNormals();
-        geometry.uvsNeedUpdate = true;
+        // geometry.uvsNeedUpdate = true;
 
-        for(let i=0; i<numSquares; i++) {
-            for(let k=0; k<numSquares; k++) {
-                let face = getQuadUV(k, i, 1, 1);
-                geometry.faceVertexUvs[0].push(face[0]);
-                geometry.faceVertexUvs[0].push(face[1]);
-            }
-        }
+        // for(let i=0; i<numSquares; i++) {
+        //     for(let k=0; k<numSquares; k++) {
+        //         let face = getQuadUV(k, i, 1, 1);
+        //         geometry.faceVertexUvs[0].push(face[0]);
+        //         geometry.faceVertexUvs[0].push(face[1]);
+        //     }
+        // }
 
         let terrain = new T.Mesh(geometry, material);
 
@@ -142,7 +142,7 @@ function drawPerlin2DTerrain() {
     seedBox.value = seed;
     seedBox.onchange = () => {
         if(Number(seedBox.value) < 0 || Number(seedBox.value) > 999999999) {
-            seedWarning.innerHTML = "Seed must be between 1 and 999999999 inclusive";
+            seedWarning.innerHTML = "Seed must be between 0 and 999999999 inclusive";
         }
         else {
             seed = Number(seedBox.value)

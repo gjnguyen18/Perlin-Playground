@@ -8,21 +8,6 @@ const terrainSize = 400;
 
 var seed = 0;
 
-let getQuadUV = (x, y, width, height, scaleX = numSquares, scaleY = numSquares) => {
-    return [
-        [
-            new T.Vector2(x / scaleX, y / scaleY),
-            new T.Vector2((x + width) / scaleX, (y + height) / scaleY),
-            new T.Vector2((x + width) / scaleX, y / scaleY)
-        ],
-        [
-            new T.Vector2(x / scaleX, y / scaleY),
-            new T.Vector2(x / scaleX, (y + height) / scaleY),
-            new T.Vector2((x + width) / scaleX, (y + height) / scaleY)
-        ]
-    ]
-}
-
 function drawPerlin2DTerrain() {
 
     seed = (Math.floor(Math.random()*9)+1)*100000000 + Math.floor(Math.random()*99999999);
@@ -126,18 +111,8 @@ function drawPerlin2DTerrain() {
 
         getPoints();
         let geometry = drawBlocks();
-
-        geometry.faceVertexUvs = [[]];
+        
         geometry.computeFaceNormals();
-        geometry.uvsNeedUpdate = true;
-
-        for(let i=0; i<numSquares; i++) {
-            for(let k=0; k<numSquares; k++) {
-                let face = getQuadUV(k, i, 1, 1);
-                geometry.faceVertexUvs[0].push(face[0]);
-                geometry.faceVertexUvs[0].push(face[1]);
-            }
-        }
 
         let terrain = new T.Mesh(geometry, material);
 

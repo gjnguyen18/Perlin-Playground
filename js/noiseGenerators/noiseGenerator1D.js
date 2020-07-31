@@ -8,9 +8,7 @@ export class NoiseGenerator1D {
         this.octaves = 3;
 
         this.randomGenerator = new RandomGenerator(this.seed);
-
-        let start = (this.mult * seed + this.inc) % this.mod
-        this.randomValues = [start];
+        this.randomValues = [];
     }
 
     setScale(x) { this.baseScale = x; }
