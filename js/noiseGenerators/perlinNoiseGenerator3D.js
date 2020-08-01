@@ -4,7 +4,7 @@ export class PerlinNoiseGenerator3D {
 
     constructor(seed = Math.floor((Math.random()*999999999))) {
         this.seed = seed;
-        this.baseScale = 0.02;
+        this.baseScale = 0.06;
         this.octaves = 3;
 
         this.randomGenerator = new RandomGenerator(this.seed);
@@ -19,7 +19,7 @@ export class PerlinNoiseGenerator3D {
         }
 
         //pregenerated grid of values
-        this.gridSize = 200;
+        this.gridSize = 150;
         this.randomValues = [];
         for(let i=0; i<this.gridSize; i++) {
             let column = [];
@@ -64,8 +64,8 @@ export class PerlinNoiseGenerator3D {
         let max = 0;
         for(let i=1; i<=this.octaves; i++) {
             let scaledX = x * this.baseScale * i + Math.pow((this.seed % 17),i);
-            let scaledY = y * this.baseScale * i + Math.pow((this.seed % 23),i);
-            let scaledZ = z * this.baseScale * i + Math.pow((this.seed % 31),i);
+            let scaledY = y * this.baseScale * i + Math.pow((this.seed % 17),i);
+            let scaledZ = z * this.baseScale * i + Math.pow((this.seed % 17),i);
 
             let xFloor = Math.floor(scaledX);
             let xCeil = Math.ceil(scaledX);
@@ -79,10 +79,10 @@ export class PerlinNoiseGenerator3D {
             let v3 = dot(getRandomValue(xFloor, yCeil, zFloor), [scaledX-xFloor, scaledY-yCeil, scaledZ-zFloor]);
             let v4 = dot(getRandomValue(xCeil, yCeil, zFloor), [scaledX-xCeil, scaledY-yCeil, scaledZ-zFloor]);
 
-            let v5 = dot(getRandomValue(xFloor, yFloor, zCeil), [scaledX-xFloor, scaledY-yFloor, scaledZ-zFloor]);
-            let v6 = dot(getRandomValue(xCeil, yFloor, zCeil), [scaledX-xCeil, scaledY-yFloor, scaledZ-zFloor]);
-            let v7 = dot(getRandomValue(xFloor, yCeil, zCeil), [scaledX-xFloor, scaledY-yCeil, scaledZ-zFloor]);
-            let v8 = dot(getRandomValue(xCeil, yCeil, zCeil), [scaledX-xCeil, scaledY-yCeil, scaledZ-zFloor]);
+            let v5 = dot(getRandomValue(xFloor, yFloor, zCeil), [scaledX-xFloor, scaledY-yFloor, scaledZ-zCeil]);
+            let v6 = dot(getRandomValue(xCeil, yFloor, zCeil), [scaledX-xCeil, scaledY-yFloor, scaledZ-zCeil]);
+            let v7 = dot(getRandomValue(xFloor, yCeil, zCeil), [scaledX-xFloor, scaledY-yCeil, scaledZ-zCeil]);
+            let v8 = dot(getRandomValue(xCeil, yCeil, zCeil), [scaledX-xCeil, scaledY-yCeil, scaledZ-zCeil]);
 
             // bilinear interpolation
             let tx = scaledX - xFloor;

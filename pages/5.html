@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <link rel="stylesheet" href="./../css/testcss.css">
+  </head>
+
+  <body>
+
+    <div class="title">
+      Perlin Noise Playground
+    </div>
+
+    <div class="centerText">
+      3D Perlin Noise into Slices
+    </div>
+
+    <canvas id="perlin3DSlicesCanvas" height="400px" width="400px"></canvas>
+    <script src="../js/displays/perlin3DSlices.js" type="module"></script>
+
+    <div class="centerInputs">
+      Seed: <input type="number" id="seedBox"> <span id="seedWarning"></span><br>
+      Auto Adjust Scale <input type="checkbox" checked="true" id="autoAdjustScaleCheck"> <br>
+      Resolution: <span id="resNum"> 200 x 200 </span> <br>
+      <input type="range" min="0" max="4" value="3" step="1" id="noise2DResolutionSlider"> <br>
+      Scale: <span id="scaleNum"> 0.02 </span> <br>
+      <input type="range" min="0.0001" max="0.2" value="0.02" step="0.0001" id="noise2DScaleSlider"> <br>
+      Octaves: <span id="octavesNum"> 3 </span> <br>
+      <input type="range" min="1" max="10" step="1" value="3" id="noise2DOctavesSlider"> <br>
+      Steps: <span id="stepsNum"> 0 </span> <br>
+      <input type="range" min="0" max="199" step="1" value="0" id="noise2DStepsSlider">
+    </div>
+
+    <div>>
+      <ul class="links">
+        <li><a href="./.."> Home Page </a></li>
+      </ul>
+    </div>
+
+  </body>
+</html>
