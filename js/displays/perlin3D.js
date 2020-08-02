@@ -1,34 +1,26 @@
-
 import * as T from "../../libs/CS559-THREE/build/three.module.js";
-import { onWindowOnload } from "../../libs/helpers.js";
+import { onWindowOnload, createSlider } from "../tools/helpers.js";
 import { PerlinNoiseGenerator3D } from "../noiseGenerators/perlinNoiseGenerator3D.js";
 
-var numSquares = 50;
+var size = 80;
 var threshold = 0.5;
+var scale = 0.05;
+var octaves = 3;
+var res = 3;
+var resOptions = [25, 40, 50, 80, 100, 200];
 const terrainSize = 400;
 
 var seed = 0;
 
 function drawPerlin3D() {
-
-    // create surface points
     seed = (Math.floor(Math.random()*9)+1)*100000000 + Math.floor(Math.random()*99999999);
     let perlinNoiseGenerator = new PerlinNoiseGenerator3D(seed);
-
-    perlinNoiseGenerator.setScale(0.06);
-    perlinNoiseGenerator.setOctaves(1);
-
     let meshPoints = [];
 
-    // create canvas  
     let canvas = /** @type {HTMLCanvasElement} */ (document.getElementById(
         "3DTerrainCanvas"
     ));
-    
-    // Set up the renderer, which will create the Canvas for us
     let renderer = new T.WebGLRenderer({ canvas: canvas });
-    
-    // the aspect ratio is set to 1 - since we're making the window 200x200
     let camera = new T.PerspectiveCamera(50, 1, 0.1, 2000);
     let scene = new T.Scene(); 
 
@@ -39,19 +31,15 @@ function drawPerlin3D() {
         let pointLight = new T.PointLight(0xffffff, 1, 2000);
         pointLight.position.set(800, 500, 800);
         scene.add(pointLight);
-
-        // let pointLight2 = new T.PointLight(0xff00ff, 1, 2000);
-        // pointLight2.position.set(-800, -500, -800);
-        // scene.add(pointLight2);
     }
 
     let getPoints = () => {
         meshPoints = [];
-        for(let i=0; i<numSquares+1; i++) {
+        for(let i=0; i<size+1; i++) {
             let column = [];
-            for(let k=0; k<numSquares+1; k++) {
+            for(let k=0; k<size+1; k++) {
                 let row = [];
-                for(let j=0; j<numSquares+1; j++) {
+                for(let j=0; j<size+1; j++) {
                     let result = perlinNoiseGenerator.getVal(i, k, j);
                     row.push(result);
                 }
@@ -67,17 +55,17 @@ function drawPerlin3D() {
             geometry.faces.push(new T.Face3(p1, p2, p4));
             geometry.faces.push(new T.Face3(p1, p4, p3));
         }
-        let blockSize = terrainSize/numSquares;
-        for(let i=0; i<numSquares+1; i++) {
-            for(let k=0; k<numSquares+1; k++) {
-                for(let j=0; j<numSquares+1; j++) {
+        let blockSize = terrainSize/size;
+        for(let i=0; i<size+1; i++) {
+            for(let k=0; k<size+1; k++) {
+                for(let j=0; j<size+1; j++) {
                     geometry.vertices.push(new T.Vector3(i*blockSize, k*blockSize, j*blockSize));
                 }
             }
         }
 
-        let line = numSquares+1;
-        let square = (numSquares+1) * (numSquares+1);
+        let line = size+1;
+        let square = (size+1) * (size+1);
 
         let distanceFromCenter = (a, b, c) => {
             let aDist = Math.abs(a * blockSize - terrainSize/2);
@@ -87,9 +75,9 @@ function drawPerlin3D() {
             return Math.sqrt(aDist*aDist + bDist*bDist + cDist*cDist);
         }
 
-        for(let i=0; i<numSquares; i++) {
-            for(let k=0; k<numSquares; k++) {
-                for(let j=0; j<numSquares; j++) {
+        for(let i=0; i<size; i++) {
+            for(let k=0; k<size; k++) {
+                for(let j=0; j<size; j++) {
                     let curr = i + line * k + square * j;
                     if(meshPoints[i][k][j] > threshold && distanceFromCenter(i, k, j) < terrainSize/2) {
                         if(i > 0) {
@@ -116,13 +104,13 @@ function drawPerlin3D() {
                         else {
                             drawSquare(curr, curr + 1, curr + line, curr + line + 1);
                         }
-                        if(meshPoints[i+1][k][j] < threshold || i == numSquares - 1 || distanceFromCenter(i+1, k, j) >= terrainSize/2) {
+                        if(meshPoints[i+1][k][j] < threshold || i == size - 1 || distanceFromCenter(i+1, k, j) >= terrainSize/2) {
                             drawSquare(curr + 1, curr + square + 1, curr + line + 1, curr + square + line + 1)
                         }
-                        if(meshPoints[i][k+1][j] < threshold || k == numSquares - 1 || distanceFromCenter(i, k+1, j) >= terrainSize/2) {
+                        if(meshPoints[i][k+1][j] < threshold || k == size - 1 || distanceFromCenter(i, k+1, j) >= terrainSize/2) {
                             drawSquare(curr + square + line, curr + line, curr + square + line + 1, curr + line + 1)
                         }
-                        if(meshPoints[i][k][j+1] < threshold || j == numSquares - 1 || distanceFromCenter(i, k, j+1) >= terrainSize/2) {
+                        if(meshPoints[i][k][j+1] < threshold || j == size - 1 || distanceFromCenter(i, k, j+1) >= terrainSize/2) {
                             drawSquare(curr + square + 1, curr + square, curr + square + line + 1, curr + square + line)
                         }
                     }
@@ -130,11 +118,12 @@ function drawPerlin3D() {
             }
         }
         return geometry;
-        // return new T.BoxGeometry(terrainSize, terrainSize, terrainSize);
     }
 
     let createTerrain = () => {
-        console.log("create");
+        perlinNoiseGenerator.setScale(scale);
+        perlinNoiseGenerator.setOctaves(octaves);
+
         while(scene.children.length > 0){ 
             scene.remove(scene.children[0]); 
         }
@@ -144,7 +133,6 @@ function drawPerlin3D() {
         let material = new T.MeshLambertMaterial({ color: "lightblue" })
         let geometry = createGeometry();
         geometry.computeFaceNormals();
-
         let terrainMesh = new T.Mesh(geometry, material);
 
         let terrainGroup = new T.Group();
@@ -166,107 +154,71 @@ function drawPerlin3D() {
 
     let seedBox = /** @type {HTMLInputElement} */ (document.getElementById("seedBox"));
     let seedWarning = /** @type {HTMLInputElement} */ (document.getElementById("seedWarning"));
-    let resolutionSlider = /** @type {HTMLInputElement} */ (document.getElementById("noise2DResolutionSlider"));
     let autoAdjustScaleCheck = /** @type {HTMLInputElement} */ (document.getElementById("autoAdjustScaleCheck"));
-    let scaleSlider = /** @type {HTMLInputElement} */ (document.getElementById("noise2DScaleSlider"));
-    let octavesSlider = /** @type {HTMLInputElement} */ (document.getElementById("noise2DOctavesSlider"));
-    let thresholdSlider = /** @type {HTMLInputElement} */ (document.getElementById("thresholdSlider"));
 
-    let lastSize = numSquares;
+    let resolutionSlider = createSlider("Resolution", 0, resOptions.length-1, 1, res);
+    let scaleSlider = createSlider("Scale", 0.0001, 0.4, 0.0001, scale);
+    let octavesSlider = createSlider("Octaves", 1, 10, 1, octaves);
+    let thresholdSlider = createSlider("Threshold", 0, 1, 0.001, threshold);
+
+    let lastSize = size;
 
     seedBox.value = seed;
     seedBox.onchange = () => {
         if(Number(seedBox.value) < 0 || Number(seedBox.value) > 999999999) {
-            seedWarning.innerHTML = "Seed must be between 1 and 999999999 inclusive";
+            seedWarning.innerHTML = "Seed must be between 0 and 999999999 inclusive";
         }
         else {
             seed = Number(seedBox.value)
-            perlinNoiseGenerator = new PerlinNoiseGenerator3D(seed);
+            perlinNoiseGenerator = new PerlinNoiseGenerator2D(seed);
             perlinNoiseGenerator.setScale(Number(scaleSlider.value));
             perlinNoiseGenerator.setOctaves(Number(octavesSlider.value));
-            createTerrain();
+            drawCanvas();
             seedWarning.innerHTML = "";
         }
     }
 
-    resolutionSlider.oninput = () => {
-        let res = Number(resolutionSlider.value);
-        switch(res) {
-            case 0:
-                numSquares = 25
-            break;
-            case 1:
-                numSquares = 40;
-            break;
-            case 2:
-                numSquares = 50;
-            break;
-            case 3:
-                numSquares = 80;
-            break;
-            case 4:
-                numSquares = 100;
-            break;
-            default:
-                numSquares = 100;
-        }
-        document.getElementById("resNum").innerHTML = numSquares + " x " + numSquares;
+    resolutionSlider[0].oninput = () => { 
+        res = resolutionSlider[0].value;
+        size = resOptions[res];
+        resolutionSlider[1].innerHTML = "Resolution: " + size + " x " + size;
     }
-    resolutionSlider.onchange = () => {
-        let res = Number(resolutionSlider.value);;
-        switch(res) {
-            case 0:
-                numSquares = 25
-            break;
-            case 1:
-                numSquares = 40;
-            break;
-            case 2:
-                numSquares = 50;
-            break;
-            case 3:
-                numSquares = 80;
-            break;
-            case 4:
-                numSquares = 100;
-            break;
-            default:
-                numSquares = 100;
-        }
+    resolutionSlider[1].innerHTML = "Resolution: " + size + " x " + size;
+    resolutionSlider[0].onchange = () => {
+        res = resolutionSlider[0].value;
+        size = resOptions[res];
         if(autoAdjustScaleCheck.checked) {
-            let ratio = numSquares / lastSize;
-            console.log(ratio);
-            let curScale = Number(scaleSlider.value);
-            let newScale = curScale / ratio;
-            scaleSlider.value = newScale;
-            perlinNoiseGenerator.setScale(newScale);
-            document.getElementById("scaleNum").innerHTML = newScale;
+            let ratio = size / lastSize;
+            let curScale = scaleSlider[0].value;
+            scale = curScale / ratio;
+            scaleSlider[0].value = scale;
+            scaleSlider[1].innerHTML = "Scale: " + scale;
         }
-        lastSize = numSquares;
+        lastSize = size;
         createTerrain();
     }
 
-    scaleSlider.oninput = () => {
-        document.getElementById("scaleNum").innerHTML = Number(scaleSlider.value);
+    scaleSlider[0].oninput = () => {
+        scaleSlider[1].innerHTML = "Scale: " + scaleSlider[0].value;
     }
-    scaleSlider.onchange = () => {
-        perlinNoiseGenerator.setScale(Number(scaleSlider.value));
+    scaleSlider[0].onchange = () => {
+        scale = scaleSlider[0].value;
+        createTerrain();
+    }
+
+    octavesSlider[0].oninput = () => {
+        octavesSlider[1].innerHTML = "Octaves: " + octavesSlider[0].value;
+    }
+    octavesSlider[0].onchange = () => {
+        octaves = octavesSlider[0].value;
         createTerrain();
     }
     
-    octavesSlider.oninput = () => {
-        document.getElementById("octavesNum").innerHTML = Number(octavesSlider.value);
+    thresholdSlider[0].oninput = () => {
+        thresholdSlider[1].innerHTML = "Threshold: " + thresholdSlider[0].value;
     }
-    octavesSlider.onchange = () => {
-        perlinNoiseGenerator.setOctaves(Number(octavesSlider.value));
-        createTerrain();
-    }
-
-    thresholdSlider.oninput = () => {
-        document.getElementById("thresholdNum").innerHTML = Number(thresholdSlider.value);
-    }
-    thresholdSlider.onchange = () => {
-        threshold = Number(thresholdSlider.value);
+    thresholdSlider[0].onchange = () => {
+        threshold = thresholdSlider[0].value;
         createTerrain();
     }
 

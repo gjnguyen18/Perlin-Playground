@@ -1,21 +1,15 @@
-import { onWindowOnload } from "../../libs/helpers.js";
+import { onWindowOnload, createSlider } from "../tools/helpers.js";
 import { NoiseGenerator1D } from "./../noiseGenerators/noiseGenerator1D.js"
 
-var numPoints = 400;
+var numPoints = 200;
 var amplitude = 200;
+var scale = 0.02;
+var octaves = 3;
 var seed = 0;
 
 let drawNoiseLine = () => {
 
-    let styleAndDraw = (fillColor, strokeColor, strokeThickness) => {
-        context.fillStyle = fillColor;
-        context.fill();
-        context.strokeStyle = strokeColor;
-        context.lineWidth = strokeThickness;
-        context.stroke();
-    }
-
-    // gets canvas and context
+    // setup
     let canvas = document.getElementById("perlin1DCanvas");
     let context = canvas.getContext('2d');
 
@@ -25,7 +19,18 @@ let drawNoiseLine = () => {
     seed = (Math.floor(Math.random()*9)+1)*100000000 + Math.floor(Math.random()*99999999);
     let generator = new NoiseGenerator1D(seed);
 
+    let styleAndDraw = (fillColor, strokeColor, strokeThickness) => {
+        context.fillStyle = fillColor;
+        context.fill();
+        context.strokeStyle = strokeColor;
+        context.lineWidth = strokeThickness;
+        context.stroke();
+    }
+
     let drawCanvas = () => {
+        generator.setScale(scale);
+        generator.setOctaves(octaves);
+        
         context.fillStyle = "White";
         context.fillRect(0,0,length,height);
 
@@ -43,7 +48,7 @@ let drawNoiseLine = () => {
         context.closePath();
 
         styleAndDraw("LightBlue", "Blue", 1);
-
+        
         context.fillStyle = "White";
         context.fillRect(0,height,length,height);
 
@@ -67,13 +72,14 @@ let drawNoiseLine = () => {
 
     let lastSize = numPoints;
 
-    let seedBox = /** @type {HTMLInputElement} */ (document.getElementById("1DseedBox"));
-    let seedWarning = /** @type {HTMLInputElement} */ (document.getElementById("1DseedWarning"));
-    let numPointsSlider = /** @type {HTMLInputElement} */ (document.getElementById("noise1DNumPointsSlider"));
-    let autoAdjustScaleCheck = /** @type {HTMLInputElement} */ (document.getElementById("1DAutoAdjustScaleCheck"));
-    let scaleSlider = /** @type {HTMLInputElement} */ (document.getElementById("noise1DScaleSlider"));
-    let amplitudeSlider = /** @type {HTMLInputElement} */ (document.getElementById("noise1DAmplitudeSlider"));
-    let octavesSlider = /** @type {HTMLInputElement} */ (document.getElementById("noise1DOctavesSlider"));
+    let seedBox = /** @type {HTMLInputElement} */ (document.getElementById("seedBox"));
+    let seedWarning = /** @type {HTMLInputElement} */ (document.getElementById("seedWarning"));
+    let autoAdjustScaleCheck = /** @type {HTMLInputElement} */ (document.getElementById("autoAdjustScaleCheck"));
+
+    let numPointsSlider = createSlider("Number of Points", 5, 400, 1, numPoints);
+    let scaleSlider = createSlider("Scale", 0.0001, 1, 0.0001, scale);
+    let amplitudeSlider = createSlider("Amplitude", 0, 350, 1, amplitude);
+    let octavesSlider = createSlider("Octaves", 1, 10, 1, octaves);
 
     seedBox.value = seed;
     seedBox.onchange = () => {
@@ -83,51 +89,52 @@ let drawNoiseLine = () => {
         else {
             seed = Number(seedBox.value)
             generator = new NoiseGenerator1D(seed);
-            generator.setScale(Number(scaleSlider.value));
-            generator.setOctaves(Number(octavesSlider.value));
+            generator.setScale(scaleSlider);
+            generator.setOctaves(octaves);
             drawCanvas();
             seedWarning.innerHTML = "";
         }
     }
 
-    numPointsSlider.oninput = () => {
-        document.getElementById("1DNumPointsTag").innerHTML = Number(numPointsSlider.value);
+    numPointsSlider[0].oninput = () => {
+        numPointsSlider[1].innerHTML = "Number of Points: " + numPointsSlider[0].value;
     }
-    numPointsSlider.onchange = () => {
-        numPoints = Number(numPointsSlider.value);
+    numPointsSlider[0].onchange = () => {
+        numPoints = numPointsSlider[0].value;
         if(autoAdjustScaleCheck.checked) {
             let ratio = numPoints / lastSize;
-            let curScale = Number(scaleSlider.value);
-            let newScale = curScale / ratio;
-            scaleSlider.value = newScale;
-            generator.setScale(newScale);
-            document.getElementById("1DScaleTag").innerHTML = newScale;
+            let curScale = scaleSlider[0].value;
+            scale = curScale / ratio;
+            generator.setScale(scale);
+
+            scaleSlider[0].value = scale;
+            scaleSlider[1].innerHTML = "Scale: " + scale;
         }
         lastSize = numPoints;
         drawCanvas();
     }
 
-    scaleSlider.oninput = () => {
-        document.getElementById("1DScaleTag").innerHTML = Number(scaleSlider.value);
+    scaleSlider[0].oninput = () => {
+        scaleSlider[1].innerHTML = "Scale: " + scaleSlider[0].value;
     }
-    scaleSlider.onchange = () => {
-        generator.setScale(Number(scaleSlider.value));
+    scaleSlider[0].onchange = () => {
+        scale = scaleSlider[0].value;
         drawCanvas();
     }
 
-    amplitudeSlider.oninput = () => {
-        document.getElementById("1DAmplitudeTag").innerHTML = Number(amplitudeSlider.value);
+    amplitudeSlider[0].oninput = () => {
+        amplitudeSlider[1].innerHTML = "Amplitude: " + amplitudeSlider[0].value;
     }
-    amplitudeSlider.onchange = () => {
-        amplitude = Number(amplitudeSlider.value);
+    amplitudeSlider[0].onchange = () => {
+        amplitude = amplitudeSlider[0].value;
         drawCanvas();
     }
 
-    octavesSlider.oninput = () => {
-        document.getElementById("1DOctavesTag").innerHTML = Number(octavesSlider.value);
+    octavesSlider[0].oninput = () => {
+        octavesSlider[1].innerHTML = "Octaves: " + octavesSlider[0].value;
     }
-    octavesSlider.onchange = () => {
-        generator.setOctaves(Number(octavesSlider.value));
+    octavesSlider[0].onchange = () => {
+        octaves = octavesSlider[0].value;
         drawCanvas();
     }
 };

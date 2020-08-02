@@ -1,45 +1,34 @@
-
 import * as T from "../../libs/CS559-THREE/build/three.module.js";
-import { onWindowOnload } from "../../libs/helpers.js";
+import { onWindowOnload, createSlider } from "../tools/helpers.js";
 import { PerlinNoiseGenerator2D } from "./../noiseGenerators/perlinNoiseGenerator2D.js";
 
-var numSquares = 100;
-var amplitude = 200;
+var size = 100;
+var amplitude = 500;
+var scale = 0.03;
+var octaves = 3;
+var res = 2;
+var resOptions = [25, 50, 100, 200, 400];
 const terrainSize = 400;
 
 var seed = 0;
 
-// let getQuadUV = (x, y, width, height, scaleX = numSquares, scaleY = numSquares) => {
-//     return [
-//         [
-//             new T.Vector2(x / scaleX, y / scaleY),
-//             new T.Vector2((x + width) / scaleX, (y + height) / scaleY),
-//             new T.Vector2((x + width) / scaleX, y / scaleY)
-//         ],
-//         [
-//             new T.Vector2(x / scaleX, y / scaleY),
-//             new T.Vector2(x / scaleX, (y + height) / scaleY),
-//             new T.Vector2((x + width) / scaleX, (y + height) / scaleY)
-//         ]
-//     ]
-// }
-
 function drawPerlin2DTerrain() {
-
-    // create surface points
     seed = (Math.floor(Math.random()*9)+1)*100000000 + Math.floor(Math.random()*99999999);
     let perlinNoiseGenerator = new PerlinNoiseGenerator2D(seed);
-
-    perlinNoiseGenerator.setScale(0.06);
-    perlinNoiseGenerator.setOctaves(3);
-
     let meshPoints = [];
+
+    let canvas = /** @type {HTMLCanvasElement} */ (document.getElementById(
+        "terrainPerlin2DCanvas"
+    ));
+    let renderer = new T.WebGLRenderer({ canvas: canvas });
+    let camera = new T.PerspectiveCamera(50, 1, 0.1, 1000);
+    let scene = new T.Scene(); 
 
     let getPoints = () => {
         meshPoints = [];
-        for(let i=0; i<numSquares+1; i++) {
+        for(let i=0; i<size+1; i++) {
             let column = [];
-            for(let k=0; k<numSquares+1; k++) {
+            for(let k=0; k<size+1; k++) {
                 let result = perlinNoiseGenerator.getVal(i, k);
                 let val = Math.floor(result * 20) / 20;
                 column.push(result*amplitude);
@@ -47,77 +36,49 @@ function drawPerlin2DTerrain() {
             meshPoints.push(column);
         }
     }
-
-    // create canvas  
-    let canvas = /** @type {HTMLCanvasElement} */ (document.getElementById(
-        "terrainPerlin2DCanvas"
-    ));
-    
-    // Set up the renderer, which will create the Canvas for us
-    let renderer = new T.WebGLRenderer({ canvas: canvas });
-    
-    // the aspect ratio is set to 1 - since we're making the window 200x200
-    let camera = new T.PerspectiveCamera(50, 1, 0.1, 1000);
-    let scene = new T.Scene(); 
   
-    //lighting
-    // let ambientLight = new T.AmbientLight(0xffffff, 0.25);
-    // scene.add(ambientLight);
-    // let pointLight = new T.PointLight(0xffffff, 1);
-    // pointLight.position.set(400, 300, 400);
-    // scene.add(pointLight);
-
-    let createTerrain = () => {
-        console.log("create");
-        while(scene.children.length > 0){ 
-            scene.remove(scene.children[0]); 
-        }
-
-        // lighting
+    let createLights = () => {
         let ambientLight = new T.AmbientLight(0xffffff, 0.25);
         scene.add(ambientLight);
         let pointLight = new T.PointLight(0xffffff, 1);
-        pointLight.position.set(800, 500, 800);
+        pointLight.position.set(400, 300, 400);
         scene.add(pointLight);
+    }
+
+    let createTerrain = () => {
+        perlinNoiseGenerator.setScale(scale);
+        perlinNoiseGenerator.setOctaves(octaves);
+
+        while(scene.children.length > 0){ 
+            scene.remove(scene.children[0]); 
+        }
+        createLights();
 
         let geometry = new T.Geometry();
         let material = new T.MeshLambertMaterial({ color: "lightblue" });
-
         getPoints();
 
-        for(let i=0; i<numSquares+1; i++) {
-            for(let k=0; k<numSquares+1; k++) {
-                geometry.vertices.push(new T.Vector3(i*terrainSize/numSquares, meshPoints[i][k], k*terrainSize/numSquares));
+        for(let i=0; i<size+1; i++) {
+            for(let k=0; k<size+1; k++) {
+                geometry.vertices.push(new T.Vector3(i*terrainSize/size, meshPoints[i][k], k*terrainSize/size));
             }
         }
 
-        for(let i=0; i<numSquares; i++) {
-            for(let k=0; k<numSquares; k++) {
-                geometry.faces.push(new T.Face3(i*(numSquares+1)+k+1, (i+1)*(numSquares+1)+k+1, i*(numSquares+1)+k));
-                geometry.faces.push(new T.Face3((i+1)*(numSquares+1)+k+1, (i+1)*(numSquares+1)+k, i*(numSquares+1)+k));
+        for(let i=0; i<size; i++) {
+            for(let k=0; k<size; k++) {
+                geometry.faces.push(new T.Face3(i*(size+1)+k+1, (i+1)*(size+1)+k+1, i*(size+1)+k));
+                geometry.faces.push(new T.Face3((i+1)*(size+1)+k+1, (i+1)*(size+1)+k, i*(size+1)+k));
             }
         }
 
-        // geometry.faceVertexUvs = [[]];
         geometry.computeFaceNormals();
-        // geometry.uvsNeedUpdate = true;
-
-        // for(let i=0; i<numSquares; i++) {
-        //     for(let k=0; k<numSquares; k++) {
-        //         let face = getQuadUV(k, i, 1, 1);
-        //         geometry.faceVertexUvs[0].push(face[0]);
-        //         geometry.faceVertexUvs[0].push(face[1]);
-        //     }
-        // }
 
         let terrain = new T.Mesh(geometry, material);
-
         let terrainGroup = new T.Group();
         terrainGroup.add(terrain);
         terrain.position.x = -terrainSize/2;
         terrain.position.z = -terrainSize/2;
         terrain.position.y = -amplitude/2;
-
         scene.add(terrainGroup);
         renderer.render(scene, camera);
     }
@@ -130,14 +91,14 @@ function drawPerlin2DTerrain() {
 
     let seedBox = /** @type {HTMLInputElement} */ (document.getElementById("seedBox"));
     let seedWarning = /** @type {HTMLInputElement} */ (document.getElementById("seedWarning"));
-    let resolutionSlider = /** @type {HTMLInputElement} */ (document.getElementById("noise2DResolutionSlider"));
     let autoAdjustScaleCheck = /** @type {HTMLInputElement} */ (document.getElementById("autoAdjustScaleCheck"));
-    let scaleSlider = /** @type {HTMLInputElement} */ (document.getElementById("noise2DScaleSlider"));
-    let octavesSlider = /** @type {HTMLInputElement} */ (document.getElementById("noise2DOctavesSlider"));
-    let amplitudeSlider = /** @type {HTMLInputElement} */ (document.getElementById("noise1DAmplitudeSlider"));
-    let stepsSlider = /** @type {HTMLInputElement} */ (document.getElementById("noise2DStepsSlider"));
 
-    let lastSize = numSquares;
+    let resolutionSlider = createSlider("Resolution", 0, resOptions.length-1, 1, res);
+    let scaleSlider = createSlider("Scale", 0.0001, 1, 0.0001, scale);
+    let octavesSlider = createSlider("Octaves", 1, 10, 1, octaves);
+    let amplitudeSlider = createSlider("Amplitude", 0, 800, 1, amplitude);
+
+    let lastSize = size;
 
     seedBox.value = seed;
     seedBox.onchange = () => {
@@ -149,101 +110,54 @@ function drawPerlin2DTerrain() {
             perlinNoiseGenerator = new PerlinNoiseGenerator2D(seed);
             perlinNoiseGenerator.setScale(Number(scaleSlider.value));
             perlinNoiseGenerator.setOctaves(Number(octavesSlider.value));
-            createTerrain();
+            drawCanvas();
             seedWarning.innerHTML = "";
         }
     }
 
-    resolutionSlider.oninput = () => {
-        let res = Number(resolutionSlider.value);
-        switch(res) {
-            case 0:
-                numSquares = 25
-            break;
-            case 1:
-                numSquares = 50;
-            break;
-            case 2:
-                numSquares = 100;
-            break;
-            case 3:
-                numSquares = 200;
-            break;
-            case 4:
-                numSquares = 400;
-            break;
-            default:
-                numSquares = 100;
-        }
-        document.getElementById("resNum").innerHTML = numSquares + " x " + numSquares;
+    resolutionSlider[0].oninput = () => {
+        res = resolutionSlider[0].value;
+        size = resOptions[res];
+        resolutionSlider[1].innerHTML = "Resolution: " + size + " x " + size;
     }
-    resolutionSlider.onchange = () => {
-        let res = Number(resolutionSlider.value);;
-        switch(res) {
-            case 0:
-                numSquares = 25
-            break;
-            case 1:
-                numSquares = 50;
-            break;
-            case 2:
-                numSquares = 100;
-            break;
-            case 3:
-                numSquares = 200;
-            break;
-            case 4:
-                numSquares = 400;
-            break;
-            default:
-                numSquares = 100;
-        }
+    resolutionSlider[1].innerHTML = "Resolution: " + size + " x " + size;
+    resolutionSlider[0].onchange = () => {
+        res = resolutionSlider[0].value;
+        size = resOptions[res];
         if(autoAdjustScaleCheck.checked) {
-            let ratio = numSquares / lastSize;
-            console.log(ratio);
-            let curScale = Number(scaleSlider.value);
-            let newScale = curScale / ratio;
-            scaleSlider.value = newScale;
-            perlinNoiseGenerator.setScale(newScale);
-            document.getElementById("scaleNum").innerHTML = newScale;
+            let ratio = size / lastSize;
+            let curScale = scaleSlider[0].value;
+            scale = curScale / ratio;
+            scaleSlider[0].value = scale;
+            scaleSlider[1].innerHTML = "Scale: " + scale;
         }
-        lastSize = numSquares;
+        lastSize = size;
         createTerrain();
     }
 
-    scaleSlider.oninput = () => {
-        document.getElementById("scaleNum").innerHTML = Number(scaleSlider.value);
+    scaleSlider[0].oninput = () => {
+        scaleSlider[1].innerHTML = "Scale: " + scaleSlider[0].value;
     }
-    scaleSlider.onchange = () => {
-        perlinNoiseGenerator.setScale(Number(scaleSlider.value));
+    scaleSlider[0].onchange = () => {
+        scale = scaleSlider[0].value;
+        createTerrain();
+    }
+
+    octavesSlider[0].oninput = () => {
+        octavesSlider[1].innerHTML = "Octaves: " + octavesSlider[0].value;
+    }
+    octavesSlider[0].onchange = () => {
+        octaves = octavesSlider[0].value;
         createTerrain();
     }
     
-    octavesSlider.oninput = () => {
-        document.getElementById("octavesNum").innerHTML = Number(octavesSlider.value);
+    amplitudeSlider[0].oninput = () => {
+        amplitudeSlider[1].innerHTML = "Amplitude: " + amplitudeSlider[0].value;
     }
-    octavesSlider.onchange = () => {
-        perlinNoiseGenerator.setOctaves(Number(octavesSlider.value));
+    amplitudeSlider[0].onchange = () => {
+        amplitude = amplitudeSlider[0].value;
         createTerrain();
     }
-
-    amplitudeSlider.oninput = () => {
-        document.getElementById("1DAmplitudeTag").innerHTML = Number(amplitudeSlider.value);
-    }
-    amplitudeSlider.onchange = () => {
-        amplitude = Number(amplitudeSlider.value);
-        createTerrain();
-    }
-
-    // stepsSlider.oninput = () => {
-    //     document.getElementById("stepsNum").innerHTML = Number(stepsSlider.value);
-    // }
-    // stepsSlider.onchange = () => {
-    //     numSteps = Number(stepsSlider.value);
-    //     createTerrain();
-    // }
-
-    // renderer.render(scene, camera);
   
     let terrainRotation = 0;
     function animate() {

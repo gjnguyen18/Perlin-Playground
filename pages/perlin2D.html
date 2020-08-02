@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <link rel="stylesheet" href="./../css/testcss.css">
+  </head>
+
+  <body>
+
+    <div class="title">
+      Perlin Noise Playground
+    </div>
+
+    <div class="centerText">
+      2D Random (Top Left) <br>
+      2D Basic Noise (Top Right) <br>
+      2D Perlin Noise (Bottom Left) <br>
+      2D Perlin Noise with Steps (Bottom Right) <br>
+    </div>
+
+    <canvas id="perlin2DCanvas" height="800px" width="800px"></canvas>
+    <script src="../js/displays/perlin2D.js" type="module"></script>
+
+    <div id="inputs" class="centerInputs">
+      Seed: <input type="number" id="seedBox"> <span id="seedWarning"></span><br>
+      Auto Adjust Scale <input type="checkbox" checked="true" id="autoAdjustScaleCheck"> <br>
+    </div>
+
+    <div>>
+      <ul class="links">
+        <li><a href="./.."> Home Page </a></li>
+      </ul>
+    </div>
+
+  </body>
+</html>

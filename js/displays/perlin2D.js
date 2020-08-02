@@ -1,23 +1,27 @@
-import { onWindowOnload } from "../../libs/helpers.js";
+import { onWindowOnload, createSlider } from "../tools/helpers.js";
 import { SimpleNoiseGenerator2D } from "./../noiseGenerators/simpleNoiseGenerator2D.js";
 import { PerlinNoiseGenerator2D } from "./../noiseGenerators/perlinNoiseGenerator2D.js";
 
 var size = 200;
 var scale = 0.02;
+var octaves = 3;
 var numSteps = 20;
 var seed = 0;
+var res = 2;
+var resOptions = [25, 50, 100, 200, 400];
 
 let drawPerlinNoise2D = () => {
 
-    // gets canvas and context
+    // setup
     let canvas = document.getElementById("perlin2DCanvas");
     let context = canvas.getContext('2d');
 
     let length = canvas.width/2;
     let height = canvas.height/2;
 
-    context.fillStyle = "White";
-    context.fillRect(0,0,length*2,height*2);
+    seed = (Math.floor(Math.random()*9)+1)*100000000 + Math.floor(Math.random()*99999999);
+    let perlinNoiseGenerator = new PerlinNoiseGenerator2D(seed);
+    let simpleNoiseGenerator = new SimpleNoiseGenerator2D(seed);
 
     let drawSquare = (x, y, val) => {
         let color = "#";
@@ -34,11 +38,12 @@ let drawPerlinNoise2D = () => {
         context.fillRect(x, y, length/size, height/size);
     }
 
-    seed = (Math.floor(Math.random()*9)+1)*100000000 + Math.floor(Math.random()*99999999);
-    let perlinNoiseGenerator = new PerlinNoiseGenerator2D(seed);
-    let simpleNoiseGenerator = new SimpleNoiseGenerator2D(seed);
-
     let drawCanvas = () => {
+        simpleNoiseGenerator.setScale(scale);
+        simpleNoiseGenerator.setOctaves(octaves);
+        perlinNoiseGenerator.setScale(scale);
+        perlinNoiseGenerator.setOctaves(octaves);
+
         for(let i=0; i<size; i++) {
             for(let k=0; k<size; k++) {
                 let result = perlinNoiseGenerator.getVal(i, k);
@@ -63,11 +68,12 @@ let drawPerlinNoise2D = () => {
 
     let seedBox = /** @type {HTMLInputElement} */ (document.getElementById("seedBox"));
     let seedWarning = /** @type {HTMLInputElement} */ (document.getElementById("seedWarning"));
-    let resolutionSlider = /** @type {HTMLInputElement} */ (document.getElementById("noise2DResolutionSlider"));
     let autoAdjustScaleCheck = /** @type {HTMLInputElement} */ (document.getElementById("autoAdjustScaleCheck"));
-    let scaleSlider = /** @type {HTMLInputElement} */ (document.getElementById("noise2DScaleSlider"));
-    let octavesSlider = /** @type {HTMLInputElement} */ (document.getElementById("noise2DOctavesSlider"));
-    let stepsSlider = /** @type {HTMLInputElement} */ (document.getElementById("noise2DStepsSlider"));
+
+    let resolutionSlider = createSlider("Resolution", 0, resOptions.length-1, 1, res);
+    let scaleSlider = createSlider("Scale", 0.0001, 1, 0.0001, scale);
+    let octavesSlider = createSlider("Octaves", 1, 10, 1, octaves);
+    let numStepsSlider = createSlider("Number of Steps", 1, 100, 1, numSteps);
 
     let lastSize = size;
 
@@ -89,90 +95,47 @@ let drawPerlinNoise2D = () => {
         }
     }
 
-    resolutionSlider.oninput = () => {
-        let res = Number(resolutionSlider.value);
-        switch(res) {
-            case 0:
-                size = 25
-            break;
-            case 1:
-                size = 50;
-            break;
-            case 2:
-                size = 100;
-            break;
-            case 3:
-                size = 200;
-            break;
-            case 4:
-                size = 400;
-            break;
-            default:
-                size = 200;
-        }
-        document.getElementById("resNum").innerHTML = size + " x " + size;
+    resolutionSlider[0].oninput = () => {
+        let res = resolutionSlider[0].value;
+        size = resOptions[res];
+        resolutionSlider[1].innerHTML = "Resolution: " + size + " x " + size;
     }
-    resolutionSlider.onchange = () => {
-        let res = Number(resolutionSlider.value);;
-        switch(res) {
-            case 0:
-                size = 25
-            break;
-            case 1:
-                size = 50;
-            break;
-            case 2:
-                size = 100;
-            break;
-            case 3:
-                size = 200;
-            break;
-            case 4:
-                size = 400;
-            break;
-            case 5:
-                size = 800;
-            break;
-            default:
-                size = 200;
-        }
+    resolutionSlider[1].innerHTML = "Resolution: " + size + " x " + size;
+    resolutionSlider[0].onchange = () => {
+        let res = resolutionSlider[0].value;
+        size = resOptions[res];
         if(autoAdjustScaleCheck.checked) {
             let ratio = size / lastSize;
-            console.log(ratio);
-            let curScale = Number(scaleSlider.value);
-            let newScale = curScale / ratio;
-            scaleSlider.value = newScale;
-            perlinNoiseGenerator.setScale(newScale);
-            simpleNoiseGenerator.setScale(newScale);
-            document.getElementById("scaleNum").innerHTML = newScale;
+            let curScale = scaleSlider[0].value;
+            scale = curScale / ratio;
+            scaleSlider[0].value = scale;
+            scaleSlider[1].innerHTML = "Scale: " + scale;
         }
         lastSize = size;
         drawCanvas();
     }
 
-    scaleSlider.oninput = () => {
-        document.getElementById("scaleNum").innerHTML = Number(scaleSlider.value);
+    scaleSlider[0].oninput = () => {
+        scaleSlider[1].innerHTML = "Scale: " + scaleSlider[0].value;
     }
-    scaleSlider.onchange = () => {
-        perlinNoiseGenerator.setScale(Number(scaleSlider.value));
-        simpleNoiseGenerator.setScale(Number(scaleSlider.value));
-        drawCanvas();
-    }
-    
-    octavesSlider.oninput = () => {
-        document.getElementById("octavesNum").innerHTML = Number(octavesSlider.value);
-    }
-    octavesSlider.onchange = () => {
-        perlinNoiseGenerator.setOctaves(Number(octavesSlider.value));
-        simpleNoiseGenerator.setOctaves(Number(octavesSlider.value));
+    scaleSlider[0].onchange = () => {
+        scale = scaleSlider[0].value;
         drawCanvas();
     }
 
-    stepsSlider.oninput = () => {
-        document.getElementById("stepsNum").innerHTML = Number(stepsSlider.value);
+    octavesSlider[0].oninput = () => {
+        octavesSlider[1].innerHTML = "Octaves: " + octavesSlider[0].value;
     }
-    stepsSlider.onchange = () => {
-        numSteps = Number(stepsSlider.value);
+    octavesSlider[0].onchange = () => {
+        octaves = octavesSlider[0].value;
+        drawCanvas();
+    }
+
+    numStepsSlider[0].oninput = () => {
+        numStepsSlider[1].innerHTML = "Number of Steps: " + numStepsSlider[0].value;
+    }
+    numStepsSlider[0].onchange = () => {
+        numSteps = numStepsSlider[0].value;
         drawCanvas();
     }
 };
