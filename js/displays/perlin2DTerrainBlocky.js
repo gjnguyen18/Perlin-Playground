@@ -138,7 +138,7 @@ function drawPerlin2DTerrain() {
             perlinNoiseGenerator = new PerlinNoiseGenerator2D(seed);
             perlinNoiseGenerator.setScale(Number(scaleSlider.value));
             perlinNoiseGenerator.setOctaves(Number(octavesSlider.value));
-            drawCanvas();
+            createTerrain();
             seedWarning.innerHTML = "";
         }
     }
