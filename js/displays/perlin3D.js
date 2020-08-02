@@ -166,11 +166,11 @@ function drawPerlin3D() {
     seedBox.value = seed;
     seedBox.onchange = () => {
         if(Number(seedBox.value) < 0 || Number(seedBox.value) > 999999999) {
-            seedWarning.innerHTML = "Seed must be between 0 and 999999999 inclusive";
+            seedWarning.innerHTML = "Seed must be between 0 and 999,999,999 inclusive";
         }
         else {
             seed = Number(seedBox.value)
-            perlinNoiseGenerator = new PerlinNoiseGenerator2D(seed);
+            perlinNoiseGenerator = new PerlinNoiseGenerator3D(seed);
             perlinNoiseGenerator.setScale(Number(scaleSlider.value));
             perlinNoiseGenerator.setOctaves(Number(octavesSlider.value));
             drawCanvas();
