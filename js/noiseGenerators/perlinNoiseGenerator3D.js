@@ -3,7 +3,7 @@ import * as Random from "../tools/random.js";
 const TABLE_SIZE = 1024;
 export class PerlinNoiseGenerator3D {
 
-    constructor(seed = Math.floor((Math.random()*999999999))) {
+    constructor(seed = Math.floor(Math.random()*999999999)) {
         this.seed = seed;
         this.baseScale = 0.02;
         this.octaves = 3;
