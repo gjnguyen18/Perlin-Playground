@@ -8,7 +8,7 @@ var scale = 0.05;
 var octaves = 3;
 var res = 3;
 var resOptions = [25, 40, 50, 80, 100, 200];
-const terrainSize = 400;
+const TERRAIN_SIZE = 400;
 
 var seed = 0;
 
@@ -55,7 +55,7 @@ function drawPerlin3D() {
             geometry.faces.push(new T.Face3(p1, p2, p4));
             geometry.faces.push(new T.Face3(p1, p4, p3));
         }
-        let blockSize = terrainSize/size;
+        let blockSize = TERRAIN_SIZE/size;
         for(let i=0; i<size+1; i++) {
             for(let k=0; k<size+1; k++) {
                 for(let j=0; j<size+1; j++) {
@@ -68,9 +68,9 @@ function drawPerlin3D() {
         let square = (size+1) * (size+1);
 
         let distanceFromCenter = (a, b, c) => {
-            let aDist = Math.abs(a * blockSize - terrainSize/2);
-            let bDist = Math.abs(b * blockSize - terrainSize/2);
-            let cDist = Math.abs(c * blockSize - terrainSize/2);
+            let aDist = Math.abs(a * blockSize - TERRAIN_SIZE/2);
+            let bDist = Math.abs(b * blockSize - TERRAIN_SIZE/2);
+            let cDist = Math.abs(c * blockSize - TERRAIN_SIZE/2);
 
             return Math.sqrt(aDist*aDist + bDist*bDist + cDist*cDist);
         }
@@ -79,9 +79,9 @@ function drawPerlin3D() {
             for(let k=0; k<size; k++) {
                 for(let j=0; j<size; j++) {
                     let curr = i + line * k + square * j;
-                    if(meshPoints[i][k][j] > threshold && distanceFromCenter(i, k, j) < terrainSize/2) {
+                    if(meshPoints[i][k][j] > threshold && distanceFromCenter(i, k, j) < TERRAIN_SIZE/2) {
                         if(i > 0) {
-                            if(meshPoints[i-1][k][j] < threshold || distanceFromCenter(i-1, k, j) >= terrainSize/2) {
+                            if(meshPoints[i-1][k][j] < threshold || distanceFromCenter(i-1, k, j) >= TERRAIN_SIZE/2) {
                                 drawSquare(curr + square, curr, curr + square + line, curr + line);
                             }
                         } 
@@ -89,7 +89,7 @@ function drawPerlin3D() {
                             drawSquare(curr+square, curr, curr + square + line, curr + line);
                         }
                         if(k > 0) {
-                            if(meshPoints[i][k-1][j] < threshold || distanceFromCenter(i, k-1, j) >= terrainSize/2) {
+                            if(meshPoints[i][k-1][j] < threshold || distanceFromCenter(i, k-1, j) >= TERRAIN_SIZE/2) {
                                 drawSquare(curr+square+1, curr + 1, curr+square, curr);
                             }
                         } 
@@ -97,20 +97,20 @@ function drawPerlin3D() {
                             drawSquare(curr+square+1, curr + 1, curr+square, curr);
                         }
                         if(j > 0) {
-                            if(meshPoints[i][k][j-1] < threshold || distanceFromCenter(i, k, j-1) >= terrainSize/2) {
+                            if(meshPoints[i][k][j-1] < threshold || distanceFromCenter(i, k, j-1) >= TERRAIN_SIZE/2) {
                                 drawSquare(curr, curr + 1, curr + line, curr + line + 1);
                             }
                         }
                         else {
                             drawSquare(curr, curr + 1, curr + line, curr + line + 1);
                         }
-                        if(meshPoints[i+1][k][j] < threshold || i == size - 1 || distanceFromCenter(i+1, k, j) >= terrainSize/2) {
+                        if(meshPoints[i+1][k][j] < threshold || i == size - 1 || distanceFromCenter(i+1, k, j) >= TERRAIN_SIZE/2) {
                             drawSquare(curr + 1, curr + square + 1, curr + line + 1, curr + square + line + 1)
                         }
-                        if(meshPoints[i][k+1][j] < threshold || k == size - 1 || distanceFromCenter(i, k+1, j) >= terrainSize/2) {
+                        if(meshPoints[i][k+1][j] < threshold || k == size - 1 || distanceFromCenter(i, k+1, j) >= TERRAIN_SIZE/2) {
                             drawSquare(curr + square + line, curr + line, curr + square + line + 1, curr + line + 1)
                         }
-                        if(meshPoints[i][k][j+1] < threshold || j == size - 1 || distanceFromCenter(i, k, j+1) >= terrainSize/2) {
+                        if(meshPoints[i][k][j+1] < threshold || j == size - 1 || distanceFromCenter(i, k, j+1) >= TERRAIN_SIZE/2) {
                             drawSquare(curr + square + 1, curr + square, curr + square + line + 1, curr + square + line)
                         }
                     }
@@ -137,17 +137,17 @@ function drawPerlin3D() {
 
         let terrainGroup = new T.Group();
         terrainGroup.add(terrainMesh);
-        terrainMesh.position.x = -terrainSize/2;
-        terrainMesh.position.y = -terrainSize/2;
-        terrainMesh.position.z = -terrainSize/2;
+        terrainMesh.position.x = -TERRAIN_SIZE/2;
+        terrainMesh.position.y = -TERRAIN_SIZE/2;
+        terrainMesh.position.z = -TERRAIN_SIZE/2;
 
         scene.add(terrainGroup);
     }
     createTerrain();
 
-    camera.position.z = terrainSize;
-    camera.position.y = terrainSize;
-    camera.position.x = -terrainSize;
+    camera.position.z = TERRAIN_SIZE;
+    camera.position.y = TERRAIN_SIZE;
+    camera.position.x = -TERRAIN_SIZE;
     camera.lookAt(0, 0, 0);
 
     renderer.render(scene, camera);

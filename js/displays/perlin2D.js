@@ -2,7 +2,7 @@ import { onWindowOnload, createSlider } from "../tools/helpers.js";
 import { SimpleNoiseGenerator2D } from "./../noiseGenerators/simpleNoiseGenerator2D.js";
 import { PerlinNoiseGenerator2D } from "./../noiseGenerators/perlinNoiseGenerator2D.js";
 
-var size = 200;
+var size = 100;
 var scale = 0.02;
 var octaves = 3;
 var numSteps = 20;

@@ -1,13 +1,13 @@
-import { RandomGenerator } from "../tools/random.js";
+import * as Random from "../tools/random.js";
 
+const TABLE_SIZE = 1024;
 export class PerlinNoiseGenerator2D {
 
     constructor(seed = Math.floor((Math.random()*999999999))) {
         this.seed = seed;
         this.baseScale = 0.02;
         this.octaves = 3;
-
-        this.randomGenerator = new RandomGenerator(this.seed);
+        this.randomGenerator = new Random.RandomGenerator(this.seed);
 
         let generateVector2D = (ang) => {
             let angle = ang * 2 * Math.PI;
@@ -16,17 +16,16 @@ export class PerlinNoiseGenerator2D {
             return [x,y];
         }
 
-        //pregenerated grid of values
-        this.gridSize = 500;
-        this.randomValues = [];
-        for(let i=0; i<this.gridSize; i++) {
-            let column = [];
-            for(let k=0; k<this.gridSize; k++) {
-                let vector2D = generateVector2D(this.randomGenerator.random());
-                column.push(vector2D);
+        let generateVectorTable = () => {
+            let table = [];
+            for(let i=0; i<TABLE_SIZE; i++) {
+                table.push(generateVector2D(this.randomGenerator.random()));
             }
-            this.randomValues.push(column);
+            return table;
         }
+
+        this.randomValues = generateVectorTable();
+        this.permutationTable = Random.createPermutationTable(TABLE_SIZE, 2, this.randomGenerator);
     }
 
     setScale(x) { this.baseScale = x; }
@@ -39,8 +38,12 @@ export class PerlinNoiseGenerator2D {
             return a + diff * step;
         }
 
-        let getRandomValue = (x, y) => {
-            return this.randomValues[x % this.gridSize][y % this.gridSize];
+        let getRandomValue = (pos) => {
+            let index = 0;
+            for(let i=0; i<pos.length; i++) {
+                index = this.permutationTable[index + (pos[i] % TABLE_SIZE)];
+            }
+            return this.randomValues[index % TABLE_SIZE];
         }
 
         let dot = (v1, v2) => {
@@ -65,10 +68,10 @@ export class PerlinNoiseGenerator2D {
             let yFloor = Math.floor(scaledY);
             let yCeil = Math.ceil(scaledY);
 
-            let v1 = dot(getRandomValue(xFloor, yFloor), [scaledX-xFloor, scaledY-yFloor]);
-            let v2 = dot(getRandomValue(xCeil, yFloor), [scaledX-xCeil, scaledY-yFloor]);
-            let v3 = dot(getRandomValue(xFloor, yCeil), [scaledX-xFloor, scaledY-yCeil]);
-            let v4 = dot(getRandomValue(xCeil, yCeil), [scaledX-xCeil, scaledY-yCeil]);
+            let v1 = dot(getRandomValue([xFloor, yFloor]), [scaledX-xFloor, scaledY-yFloor]);
+            let v2 = dot(getRandomValue([xCeil, yFloor]), [scaledX-xCeil, scaledY-yFloor]);
+            let v3 = dot(getRandomValue([xFloor, yCeil]), [scaledX-xFloor, scaledY-yCeil]);
+            let v4 = dot(getRandomValue([xCeil, yCeil]), [scaledX-xCeil, scaledY-yCeil]);
 
             // bilinear interpolation
             let tx = scaledX - xFloor;

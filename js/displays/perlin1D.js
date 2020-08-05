@@ -77,7 +77,7 @@ let drawNoiseLine = () => {
     let autoAdjustScaleCheck = /** @type {HTMLInputElement} */ (document.getElementById("autoAdjustScaleCheck"));
 
     let numPointsSlider = createSlider("Number of Points", 5, 400, 1, numPoints);
-    let scaleSlider = createSlider("Scale", 0.0001, 1, 0.0001, scale);
+    let scaleSlider = createSlider("Scale", 0.0001, 0.4, 0.0001, scale);
     let amplitudeSlider = createSlider("Amplitude", 0, 350, 1, amplitude);
     let octavesSlider = createSlider("Octaves", 1, 10, 1, octaves);
 

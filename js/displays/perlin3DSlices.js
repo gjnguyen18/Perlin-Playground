@@ -92,8 +92,10 @@ let drawPerlinNoise3DSlices = () => {
             scaleSlider[0].value = scale;
             scaleSlider[1].innerHTML = "Scale: " + scale;
             levelSlider[0].setAttribute("max", size);
-            levelSlider[0].value = level >= size ? size : level;
-            levelSlider[1].innerHTML = "Level: " + (level >= size ? size : level);
+            level *= ratio;
+            level = level >= size ? size : level;
+            levelSlider[1].innerHTML = "Level: " + level;
+            levelSlider[0].value = level;
         }
         lastSize = size;
         drawCanvas();

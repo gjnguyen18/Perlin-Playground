@@ -1,4 +1,4 @@
-import { RandomGenerator } from "../tools/random.js";
+import * as Random from "../tools/random.js";
 
 export class SimpleNoiseGenerator2D {
 
@@ -6,8 +6,7 @@ export class SimpleNoiseGenerator2D {
         this.seed = seed;
         this.baseScale = 0.02;
         this.octaves = 3;
-
-        this.randomGenerator = new RandomGenerator(this.seed);
+        this.randomGenerator = new Random.RandomGenerator(this.seed);
 
         //pregenerated grid of values
         this.gridSize = 500;

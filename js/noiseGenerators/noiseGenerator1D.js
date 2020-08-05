@@ -1,14 +1,24 @@
-import { RandomGenerator } from "../tools/random.js";
+import * as Random from "../tools/random.js";
 
+const TABLE_SIZE = 1024;
 export class NoiseGenerator1D {
 
     constructor(seed = Math.floor(Math.random()*999999999)) {
         this.seed = seed;
         this.baseScale = 0.02;
         this.octaves = 3;
+        this.randomGenerator = new Random.RandomGenerator(this.seed);
 
-        this.randomGenerator = new RandomGenerator(this.seed);
-        this.randomValues = [];
+        let generateTable = () => {
+            let table = [];
+            for(let i=0; i<TABLE_SIZE; i++) {
+                table.push(this.randomGenerator.random());
+            }
+            return table;
+        }
+
+        this.randomValues = generateTable();
+        this.permutationTable = Random.createPermutationTable(TABLE_SIZE, 1, this.randomGenerator);
     }
 
     setScale(x) { this.baseScale = x; }
@@ -22,11 +32,10 @@ export class NoiseGenerator1D {
             return a + diff * step;
         }
 
-        let getRandomValue = (x) => {
-            while(this.randomValues.length <= x) {
-                this.randomValues.push(this.randomGenerator.random());
-            }
-            return this.randomValues[x];
+        let getRandomValue = (pos) => {
+            let index = 0;
+            index = this.permutationTable[pos % TABLE_SIZE];
+            return this.randomValues[index % TABLE_SIZE];
         }
 
         let result = 0;

@@ -94,7 +94,7 @@ function drawPerlin2DTerrain() {
     let autoAdjustScaleCheck = /** @type {HTMLInputElement} */ (document.getElementById("autoAdjustScaleCheck"));
 
     let resolutionSlider = createSlider("Resolution", 0, resOptions.length-1, 1, res);
-    let scaleSlider = createSlider("Scale", 0.0001, 1, 0.0001, scale);
+    let scaleSlider = createSlider("Scale", 0.0001, 0.4, 0.0001, scale);
     let octavesSlider = createSlider("Octaves", 1, 10, 1, octaves);
     let amplitudeSlider = createSlider("Amplitude", 0, 800, 1, amplitude);
 

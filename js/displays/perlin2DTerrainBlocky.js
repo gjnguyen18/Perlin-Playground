@@ -8,7 +8,7 @@ var scale = 0.03;
 var octaves = 3;
 var res = 2;
 var resOptions = [25, 50, 100, 200, 400];
-const terrainSize = 400;
+const TERRAIN_SIZE = 400;
 
 var seed = 0;
 
@@ -30,7 +30,7 @@ function drawPerlin2DTerrain() {
             let column = [];
             for(let k=0; k<size+1; k++) {
                 let result = perlinNoiseGenerator.getVal(i, k);
-                let blockHeight = terrainSize / size;
+                let blockHeight = TERRAIN_SIZE / size;
                 let val = Math.floor(result * amplitude / blockHeight);
                 column.push(val * blockHeight);
             }
@@ -47,10 +47,10 @@ function drawPerlin2DTerrain() {
         for(let i=0; i<size; i++) {
             for(let k=0; k<size; k++) {
                 let thisVal = meshPoints[k][i];
-                geometry.vertices.push(new T.Vector3(k*terrainSize/size, thisVal, i*terrainSize/size));
-                geometry.vertices.push(new T.Vector3((k+1)*terrainSize/size, thisVal, i*terrainSize/size));
-                geometry.vertices.push(new T.Vector3(k*terrainSize/size, thisVal, (i+1)*terrainSize/size));
-                geometry.vertices.push(new T.Vector3((k+1)*terrainSize/size, thisVal, (i+1)*terrainSize/size));
+                geometry.vertices.push(new T.Vector3(k*TERRAIN_SIZE/size, thisVal, i*TERRAIN_SIZE/size));
+                geometry.vertices.push(new T.Vector3((k+1)*TERRAIN_SIZE/size, thisVal, i*TERRAIN_SIZE/size));
+                geometry.vertices.push(new T.Vector3(k*TERRAIN_SIZE/size, thisVal, (i+1)*TERRAIN_SIZE/size));
+                geometry.vertices.push(new T.Vector3((k+1)*TERRAIN_SIZE/size, thisVal, (i+1)*TERRAIN_SIZE/size));
 
                 let l = geometry.vertices.length;
                 drawSquare(l-4,l-3,l-2,l-1);
@@ -104,8 +104,8 @@ function drawPerlin2DTerrain() {
 
         let terrainGroup = new T.Group();
         terrainGroup.add(terrain);
-        terrain.position.x = -terrainSize/2;
-        terrain.position.z = -terrainSize/2;
+        terrain.position.x = -TERRAIN_SIZE/2;
+        terrain.position.z = -TERRAIN_SIZE/2;
         terrain.position.y = -amplitude/2;
         scene.add(terrainGroup);
         renderer.render(scene, camera);
@@ -115,7 +115,7 @@ function drawPerlin2DTerrain() {
     camera.position.z = 240;
     camera.position.y = 320;
     camera.position.x = -240;
-    camera.lookAt(0,-terrainSize*.15,0);
+    camera.lookAt(0,-TERRAIN_SIZE*.15,0);
 
     let seedBox = /** @type {HTMLInputElement} */ (document.getElementById("seedBox"));
     let seedWarning = /** @type {HTMLInputElement} */ (document.getElementById("seedWarning"));

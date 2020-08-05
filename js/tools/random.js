@@ -19,6 +19,7 @@ export class RandomGenerator {
             Math.floor(((this.seed%10000)/1000) + 7)*151 + 
             Math.floor(((this.seed%10000000)/1000000) + 2) * 947
         ), 2);
+        // console.log(this.mult + " " + this.inc + " " + this.mod)
     }
 
     random() {
@@ -27,4 +28,28 @@ export class RandomGenerator {
         return (newNum / this.mod);
     }
 
+}
+
+export function createPermutationTable(size, numDim, generator) {
+    let table = [];
+
+    for(let i=0; i<size; i++) {
+        table.push(i);
+    }
+
+    for(let i=0; i<size*4; i++) {
+        let index1 = (Math.floor(generator.random() * size * 23) + i) % size;
+        let index2 = (Math.floor(generator.random() * size * 17) + i) % size;
+
+        let val = table[index1];
+        table[index1] = table[index2];
+        table[index2] = val;
+    }
+
+    for(let i=0; i<numDim-1; i++) {
+        for(let k=0; k<size; k++) {
+            table.push(table[k]);
+        }
+    }
+    return table;
 }
