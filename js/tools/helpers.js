@@ -25,3 +25,28 @@ export function createSlider(name, min, max, step, value) {
     document.getElementById('inputs').appendChild(slider);
     return [slider, label];
 }
+
+export function createCheckbox(name, value) {//}, onFunc, offFunc) {
+    let checkbox = document.createElement("input");
+    checkbox.setAttribute("type", "checkbox");
+    checkbox.setAttribute("checked", value);
+
+    checkbox.id = name + "-check";
+
+    let label = document.createElement("span");
+    label.id = name + "-label";
+    label.innerHTML = name;
+
+    document.getElementById('inputs').appendChild(label);
+    document.getElementById('inputs').appendChild(checkbox);
+    document.getElementById('inputs').appendChild(document.createElement("BR"));
+
+    // checkbox.onclick = () => {
+    //     if(checkbox.checked) {
+    //         onFunc();
+    //     } else {
+    //         offFunc();
+    //     }
+    // }
+    return checkbox;
+}

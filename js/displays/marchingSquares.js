@@ -1,16 +1,16 @@
-import { onWindowOnload, createSlider } from "../tools/helpers.js";
-import { SimpleNoiseGenerator2D } from "../noiseGenerators/simpleNoiseGenerator2D.js";
+import { onWindowOnload, createSlider, createCheckbox } from "../tools/helpers.js";
 import { PerlinNoiseGenerator2D } from "../noiseGenerators/perlinNoiseGenerator2D.js";
 
 var size = 50;
-var scale = 0.1;
+var scale = 0.06;
 var octaves = 3;
 // var numSteps = 2;
 var seed = 0;
-var res = 1;
+var res = 2;
 var threshold = 0.5;
-var interpolatePoints = false;
-var resOptions = [25, 50, 100, 200, 400];
+var interpolatePoints = true;
+var autoAdjust = true;
+var resOptions = [10, 25, 50, 100, 200, 400];
 
 let drawPerlinNoise2D = () => {
 
@@ -18,34 +18,30 @@ let drawPerlinNoise2D = () => {
     let canvas = document.getElementById("marchingSquaresCanvas");
     let context = canvas.getContext('2d');
 
-    let length = canvas.width;
+    let length = canvas.width/2;
     let height = canvas.height;
 
     seed = (Math.floor(Math.random()*9)+1)*100000000 + Math.floor(Math.random()*99999999);
     let perlinNoiseGenerator = new PerlinNoiseGenerator2D(seed);
 
-    // let drawSquare = (x, y, val) => {
-    //     let color = "#";
-    //     for(let i=0; i<3; i++) {
-    //         let grey = (Math.floor(val * 255)).toString(16);
-    //         if(grey.length==1) {
-    //             color += "0" + grey;
-    //         }
-    //         else {
-    //             color += grey;
-    //         }
-    //     }
-    //     context.fillStyle = color;       
-    //     context.fillRect(x, y, length/size, height/size);
-    // }
+    let drawSquare = (x, y, val) => {
+        let color = "#";
+        for(let i=0; i<3; i++) {
+            let grey = (Math.floor(val * 255)).toString(16);
+            if(grey.length==1) {
+                color += "0" + grey;
+            }
+            else {
+                color += grey;
+            }
+        }
+        context.fillStyle = color;       
+        context.fillRect(x, y, length/size, height/size);
+    }
 
-    // corners: 0 - top left, 1 - top right, 2 - bottom right, 3 - bottom left
-    let styleAndDraw = (fillColor, strokeColor, strokeThickness) => {
+    let styleAndDraw = (fillColor) => {
         context.fillStyle = fillColor;
         context.fill();
-        // context.strokeStyle = strokeColor;
-        // context.lineWidth = strokeThickness;
-        // context.stroke();
     }
 
     let lerp = (a, b, t) => {
@@ -54,6 +50,11 @@ let drawPerlinNoise2D = () => {
 
     let getMidPoint = (p1, p2) => {
         return [lerp(p1[0], p2[0], .5), lerp(p1[1], p2[1], .5)];
+    }
+    
+    let getMidPointLerp = (p1, p2) => {
+        let t = (threshold - p1[2]) / (p2[2] - p1[2]);
+        return [lerp(p1[0], p2[0], t), lerp(p1[1], p2[1], t)];
     }
 
     let fillSquare = (x, y) => {
@@ -72,16 +73,17 @@ let drawPerlinNoise2D = () => {
         let points = [];
 
         for(let i=0; i<4; i++) {
-            if(interpolatePoints) {
+            let val1 = corners[i][2] > threshold ? 1 : 0;
+            let val2 = corners[(i+1) % 4][2] > threshold ? 1 : 0;
 
-            } else {
-                let val1 = corners[i][2] > threshold ? 1 : 0;
-                let val2 = corners[(i+1) % 4][2] > threshold ? 1 : 0;
-
-                if(val1 == 1) {
-                    points.push(corners[i]);
+            if(val1 == 1) {
+                points.push(corners[i]);
+            }
+            if(val1 != val2) {
+                if(interpolatePoints) {
+                    points.push(getMidPointLerp(corners[i], corners[(i+1) % 4]));
                 }
-                if(val1 != val2) {
+                else {
                     points.push(getMidPoint(corners[i], corners[(i+1) % 4]));
                 }
             }
@@ -97,7 +99,7 @@ let drawPerlinNoise2D = () => {
             context.lineTo((points[i][0] + x) * spacing, (points[i][1] + y) * spacing);
         }
         context.closePath();
-        styleAndDraw("Black", "Blue", 0);
+        styleAndDraw("Black");
 
     }
 
@@ -106,41 +108,40 @@ let drawPerlinNoise2D = () => {
         perlinNoiseGenerator.setOctaves(octaves);
 
         context.fillStyle = "White";
-        context.fillRect(0, 0, length, height);
+        context.fillRect(0, 0, length*2, height);
 
+        let spacing = length/size;
         for(let i=0; i<size+1; i++) {
             for(let k=0; k<size+1; k++) {
                 fillSquare(i, k);
-
-                // context.fillStyle = "Blue";
-                // let spacing = length/size;
-                // context.beginPath();
-                // context.arc(i*spacing, k*spacing, 1, 0, Math.PI * 2);
-                // context.fill();
-                // context.closePath();
-
-                // if(perlinNoiseGenerator.getVal(i, k) > threshold) {
-                //     context.fillStyle = "Red";
-                //     context.beginPath();
-                //     context.arc(i*spacing, k*spacing, 1, 0, Math.PI * 2);
-                //     context.fill();
-                //     context.closePath();
-                // }
             }
         }
+
+        for(let i=0; i<size+1; i++) {
+            for(let k=0; k<size+1; k++) {
+                let result = perlinNoiseGenerator.getVal(i, k);
+                let val = result > threshold ? 0 : 1;
+                drawSquare(i*spacing+length, k*spacing, val)
+            }
+        }
+
+        context.fillStyle = "#14c94b";
+        context.fillRect(length-2, 0, 4, height)
     }
 
     drawCanvas();
 
     let seedBox = /** @type {HTMLInputElement} */ (document.getElementById("seedBox"));
     let seedWarning = /** @type {HTMLInputElement} */ (document.getElementById("seedWarning"));
-    let autoAdjustScaleCheck = /** @type {HTMLInputElement} */ (document.getElementById("autoAdjustScaleCheck"));
 
-    let resolutionSlider = createSlider("Resolution", 0, resOptions.length-1, 1, res);
+    let lerpCheck = createCheckbox("Linear Interpolation", interpolatePoints);
+    let autoAdjustScaleCheck = createCheckbox("Auto Adjust Scale", autoAdjust);
+
+    let resolutionSlider = createSlider("Number of Points", 0, resOptions.length-1, 1, res);
     let scaleSlider = createSlider("Scale", 0.0001, 1, 0.0001, scale);
     let octavesSlider = createSlider("Octaves", 1, 10, 1, octaves);
     let thresholdSlider = createSlider("Threshold", 0, 1, 0.001, threshold);
-    // let numStepsSlider = createSlider("Number of Steps", 1, 100, 1, numSteps);
+
 
     let lastSize = size;
 
@@ -159,16 +160,24 @@ let drawPerlinNoise2D = () => {
         }
     }
 
+    lerpCheck.onclick = () => {
+        interpolatePoints = lerpCheck.checked;
+        drawCanvas();
+    }
+    autoAdjustScaleCheck.onClick = () => {
+        autoAdjust = autoAdjustScaleCheck.checked;
+    }
+
     resolutionSlider[0].oninput = () => {
         let res = resolutionSlider[0].value;
         size = resOptions[res];
-        resolutionSlider[1].innerHTML = "Resolution: " + size + " x " + size;
+        resolutionSlider[1].innerHTML = "Number of Points: " + size + " x " + size;
     }
-    resolutionSlider[1].innerHTML = "Resolution: " + size + " x " + size;
+    resolutionSlider[1].innerHTML = "Number of Points: " + size + " x " + size;
     resolutionSlider[0].onchange = () => {
         let res = resolutionSlider[0].value;
         size = resOptions[res];
-        if(autoAdjustScaleCheck.checked) {
+        if(autoAdjust) {
             let ratio = size / lastSize;
             let curScale = scaleSlider[0].value;
             scale = curScale / ratio;
