@@ -162,9 +162,10 @@ let drawPerlinNoise2D = () => {
 
     lerpCheck.onclick = () => {
         interpolatePoints = lerpCheck.checked;
+        // console.log(autoAdjust)
         drawCanvas();
     }
-    autoAdjustScaleCheck.onClick = () => {
+    autoAdjustScaleCheck.onclick = () => {
         autoAdjust = autoAdjustScaleCheck.checked;
     }
 
