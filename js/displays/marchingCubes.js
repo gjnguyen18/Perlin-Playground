@@ -1,5 +1,5 @@
 import * as T from "../../libs/CS559-THREE/build/three.module.js";
-import { onWindowOnload, createSlider } from "../tools/helpers.js";
+import { onWindowOnload, createSlider, createCheckbox } from "../tools/helpers.js";
 import { triTable, edgeTable, edgeCorners } from "../tools/marchingCubesTables.js";
 import { PerlinNoiseGenerator3D } from "../noiseGenerators/perlinNoiseGenerator3D.js";
 
@@ -9,8 +9,9 @@ var scale = 0.05;
 var octaves = 3;
 var res = 2;
 var resOptions = [25, 40, 50, 80, 100, 200];
-var interpolatePoints = true;
+var interpolatePoints = false;
 var makeSphere = false;
+var autoAdjust = true;
 const TERRAIN_SIZE = 400;
 
 var seed = 0;
@@ -240,7 +241,7 @@ function drawPerlin3D() {
         //     return Math.sqrt(aDist*aDist + bDist*bDist + cDist*cDist);
         // }
 
-        console.log("size " + size)
+        // console.log("size " + size)
         for(let x=0; x<size; x++) {
             for(let y=0; y<size; y++) {
                 for(let z=0; z<size; z++) {
@@ -294,7 +295,10 @@ function drawPerlin3D() {
 
     let seedBox = /** @type {HTMLInputElement} */ (document.getElementById("seedBox"));
     let seedWarning = /** @type {HTMLInputElement} */ (document.getElementById("seedWarning"));
-    let autoAdjustScaleCheck = /** @type {HTMLInputElement} */ (document.getElementById("autoAdjustScaleCheck"));
+
+    let lerpCheck = createCheckbox("Linear Interpolation", interpolatePoints);
+    let makeSphereCheck = createCheckbox("Make Sphere", makeSphere);
+    let autoAdjustScaleCheck = createCheckbox("Auto Adjust Scale", autoAdjust);
 
     let resolutionSlider = createSlider("Resolution", 0, resOptions.length-1, 1, res);
     let scaleSlider = createSlider("Scale", 0.0001, 0.4, 0.0001, scale);
@@ -318,6 +322,18 @@ function drawPerlin3D() {
         }
     }
 
+    lerpCheck.onclick = () => {
+        interpolatePoints = lerpCheck.checked;
+        createTerrain();
+    }
+    makeSphereCheck.onclick = () => {
+        makeSphere = makeSphereCheck.checked;
+        createTerrain();
+    }
+    autoAdjustScaleCheck.onclick = () => {
+        autoAdjust = autoAdjustScaleCheck.checked;
+    }
+
     resolutionSlider[0].oninput = () => { 
         res = resolutionSlider[0].value;
         size = resOptions[res];
@@ -327,7 +343,7 @@ function drawPerlin3D() {
     resolutionSlider[0].onchange = () => {
         res = resolutionSlider[0].value;
         size = resOptions[res];
-        if(autoAdjustScaleCheck.checked) {
+        if(autoAdjust) {
             let ratio = size / lastSize;
             let curScale = scaleSlider[0].value;
             scale = curScale / ratio;

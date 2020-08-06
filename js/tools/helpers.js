@@ -29,7 +29,7 @@ export function createSlider(name, min, max, step, value) {
 export function createCheckbox(name, value) {//}, onFunc, offFunc) {
     let checkbox = document.createElement("input");
     checkbox.setAttribute("type", "checkbox");
-    checkbox.setAttribute("checked", value);
+    checkbox.checked = value;
 
     checkbox.id = name + "-check";
 
