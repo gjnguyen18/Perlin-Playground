@@ -181,9 +181,9 @@ function drawPerlin3D() {
     resolutionSlider[0].oninput = () => { 
         res = resolutionSlider[0].value;
         size = resOptions[res];
-        resolutionSlider[1].innerHTML = "Resolution: " + size + " x " + size;
+        resolutionSlider[1].innerHTML = "Resolution: " + size + " x " + size + " x " + size;
     }
-    resolutionSlider[1].innerHTML = "Resolution: " + size + " x " + size;
+    resolutionSlider[1].innerHTML = "Resolution: " + size + " x " + size + " x " + size;
     resolutionSlider[0].onchange = () => {
         res = resolutionSlider[0].value;
         size = resOptions[res];

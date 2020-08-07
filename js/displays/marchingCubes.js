@@ -60,24 +60,8 @@ function drawPerlin3D() {
     // console.log([[4, 2, 1],[5, 2, 1]].toString());
 
     let fillCube = (x, y, z, geometry, geometryVertices, values) => {
-        // let v0 = perlinNoiseGenerator.getVal(x, y, z);
-        // let v1 = perlinNoiseGenerator.getVal(x+1, y, z);
-        // let v2 = perlinNoiseGenerator.getVal(x+1, y, z+1);
-        // let v3 = perlinNoiseGenerator.getVal(x, y, z+1);
-        // let v4 = perlinNoiseGenerator.getVal(x, y+1, z);
-        // let v5 = perlinNoiseGenerator.getVal(x+1, y+1, z);
-        // let v6 = perlinNoiseGenerator.getVal(x+1, y+1, z+1);
-        // let v7 = perlinNoiseGenerator.getVal(x, y+1, z+1);
 
-        // let v0 = 1;
-        // let v1 = 0;
-        // let v2 = 0;
-        // let v3 = 1;
-        // let v4 = 0;
-        // let v5 = 0;
-        // let v6 = 0;
-        // let v7 = 0;
-
+        // get corners
         let corners = [];
         corners.push([0, 0, 0, values[0]]);
         corners.push([1, 0, 0, values[1]]);
@@ -88,6 +72,7 @@ function drawPerlin3D() {
         corners.push([1, 1, 1, values[6]]);
         corners.push([0, 1, 1, values[7]]);
 
+        // find out which corners are above threshold and get cube index
         let cubeIndex = 0;
         let mult = 1;
         for(let i = 0; i<8; i++) {
@@ -101,11 +86,6 @@ function drawPerlin3D() {
             return;
         }
 
-        // console.log(cubeIndex);
-        // console.log(triTable[cubeIndex]);
-        // console.log(edgeTable[cubeIndex].toString(16));
-        // console.log(edgeTable[cubeIndex]);
-
         let edge = edgeTable[cubeIndex];
         let edgeNums = [];
         for(let i=0; i<12; i++) {
@@ -115,13 +95,11 @@ function drawPerlin3D() {
             }
         }
 
-        // console.log(edgeNums);
         let blockSize = TERRAIN_SIZE/size;
 
         let edgePoints = [];
         for(let i=0; i<edgeNums.length; i++) {
             let edgeCorner = edgeCorners[edgeNums[i]];
-            // console.log(edgeCorners)
             let p1 = corners[edgeCorner[0]];
             let p2 = corners[edgeCorner[1]];
 
@@ -139,45 +117,22 @@ function drawPerlin3D() {
                     (point[1] + y) * blockSize, 
                     (point[2] + z) * blockSize
                 ));
-                // console.log("new vector")
             } else {
                 pointNum = mappedPoint;
             }
-
-            // console.log(geometry.vertices[pointNum]);
             edgePoints.push(pointNum);
-            // if(interpolatePoints) {
-            //     point = getMidPointLerp(p1, p2);
-            // } else {
-            //     point = getMidPoint(p1, p2);
-            // }
         }
 
-        // console.log(geometry.vertices);
-        // console.log(edgePoints);
         let facePoints = triTable[cubeIndex];
-        // console.log(edgeNums);
-
-        // for(let i=0; i<edgePoints; i++) {
-        //     let edgePoint = edgePoints[i];
-        //     geometry.vertices.push(new T.Vector3(edgePoint[0], edgePoint[1], edgePoint[2]))
-        // }
-        // console.log(facePoints);
 
         for(let i=0; i<facePoints.length; i+=3) {
-            // console.log(edgePoints[edgeNums.indexOf[facePoints[i]]] + " " + edgePoints[edgeNums.indexOf[facePoints[i+1]]] + " " + edgePoints[edgeNums.indexOf[facePoints[i+2]]])
-            // console.log(facePoints[i] + " " + facePoints[i+1] + " " + facePoints[i+2]);
-            // console.log(edgeNums.indexOf(facePoints[i]) + " " + edgeNums.indexOf(facePoints[i+1]) + " " + edgeNums.indexOf(facePoints[i+2]));
             geometry.faces.push(new T.Face3(
                 edgePoints[edgeNums.indexOf(facePoints[i])], 
                 edgePoints[edgeNums.indexOf(facePoints[i+1])],
                 edgePoints[edgeNums.indexOf(facePoints[i+2])]
             ));
         }
-
-        // console.log(edgePoints);
     }
-    // fillCube(0,0,0, new T.Geometry());
 
     let distanceFromCenter = (a, b, c) => {
         let blockSize = TERRAIN_SIZE/size;
@@ -220,28 +175,7 @@ function drawPerlin3D() {
     let createGeometry = () => {
         let geometry = new T.Geometry();
         let geometryVertices = new Map();
-        // let drawSquare = (p1, p2, p3, p4) => {
-        //     geometry.faces.push(new T.Face3(p1, p2, p4));
-        //     geometry.faces.push(new T.Face3(p1, p4, p3));
-        // }
-        // let blockSize = TERRAIN_SIZE/size;
-        // for(let i=0; i<size+1; i++) {
-        //     for(let k=0; k<size+1; k++) {
-        //         for(let j=0; j<size+1; j++) {
-        //             geometry.vertices.push(new T.Vector3(i*blockSize, k*blockSize, j*blockSize));
-        //         }
-        //     }
-        // }
 
-        // let distanceFromCenter = (a, b, c) => {
-        //     let aDist = Math.abs(a * blockSize - TERRAIN_SIZE/2);
-        //     let bDist = Math.abs(b * blockSize - TERRAIN_SIZE/2);
-        //     let cDist = Math.abs(c * blockSize - TERRAIN_SIZE/2);
-
-        //     return Math.sqrt(aDist*aDist + bDist*bDist + cDist*cDist);
-        // }
-
-        // console.log("size " + size)
         for(let x=0; x<size; x++) {
             for(let y=0; y<size; y++) {
                 for(let z=0; z<size; z++) {
@@ -296,6 +230,8 @@ function drawPerlin3D() {
     let seedBox = /** @type {HTMLInputElement} */ (document.getElementById("seedBox"));
     let seedWarning = /** @type {HTMLInputElement} */ (document.getElementById("seedWarning"));
 
+    let thresholdSlider = createSlider("Threshold", 0, 1, 0.001, threshold);
+
     let lerpCheck = createCheckbox("Linear Interpolation", interpolatePoints);
     let makeSphereCheck = createCheckbox("Make Sphere", makeSphere);
     let autoAdjustScaleCheck = createCheckbox("Auto Adjust Scale", autoAdjust);
@@ -303,7 +239,6 @@ function drawPerlin3D() {
     let resolutionSlider = createSlider("Resolution", 0, resOptions.length-1, 1, res);
     let scaleSlider = createSlider("Scale", 0.0001, 0.4, 0.0001, scale);
     let octavesSlider = createSlider("Octaves", 1, 10, 1, octaves);
-    let thresholdSlider = createSlider("Threshold", 0, 1, 0.001, threshold);
 
     let lastSize = size;
 
@@ -337,9 +272,9 @@ function drawPerlin3D() {
     resolutionSlider[0].oninput = () => { 
         res = resolutionSlider[0].value;
         size = resOptions[res];
-        resolutionSlider[1].innerHTML = "Resolution: " + size + " x " + size;
+        resolutionSlider[1].innerHTML = "Resolution: " + size + " x " + size + " x " + size;
     }
-    resolutionSlider[1].innerHTML = "Resolution: " + size + " x " + size;
+    resolutionSlider[1].innerHTML = "Resolution: " + size + " x " + size + " x " + size;
     resolutionSlider[0].onchange = () => {
         res = resolutionSlider[0].value;
         size = resOptions[res];
@@ -372,6 +307,10 @@ function drawPerlin3D() {
     
     thresholdSlider[0].oninput = () => {
         thresholdSlider[1].innerHTML = "Threshold: " + thresholdSlider[0].value;
+        if(size <= 25) {
+            threshold = thresholdSlider[0].value;
+            createTerrain();
+        }
     }
     thresholdSlider[0].onchange = () => {
         threshold = thresholdSlider[0].value;
