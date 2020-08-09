@@ -1,13 +1,15 @@
 import * as T from "../../libs/CS559-THREE/build/three.module.js";
-import { onWindowOnload, createSlider } from "../tools/helpers.js";
+import { onWindowOnload, createSlider, createCheckbox } from "../tools/helpers.js";
 import { PerlinNoiseGenerator3D } from "../noiseGenerators/perlinNoiseGenerator3D.js";
 
-var size = 80;
-var threshold = 0.5;
-var scale = 0.05;
+var size = 50;
+var threshold = 0.52;
+var scale = 0.03;
 var octaves = 3;
 var res = 3;
 var resOptions = [25, 40, 50, 80, 100, 200];
+var makeSphere = false;
+var autoAdjust = true;
 const TERRAIN_SIZE = 400;
 
 var seed = 0;
@@ -79,9 +81,9 @@ function drawPerlin3D() {
             for(let k=0; k<size; k++) {
                 for(let j=0; j<size; j++) {
                     let curr = i + line * k + square * j;
-                    if(meshPoints[i][k][j] > threshold && distanceFromCenter(i, k, j) < TERRAIN_SIZE/2) {
+                    if(meshPoints[i][k][j] > threshold && ((distanceFromCenter(i, k, j) < TERRAIN_SIZE/2 && makeSphere) || !makeSphere)) {
                         if(i > 0) {
-                            if(meshPoints[i-1][k][j] < threshold || distanceFromCenter(i-1, k, j) >= TERRAIN_SIZE/2) {
+                            if(meshPoints[i-1][k][j] < threshold || (distanceFromCenter(i-1, k, j) >= TERRAIN_SIZE/2 && makeSphere)) {
                                 drawSquare(curr + square, curr, curr + square + line, curr + line);
                             }
                         } 
@@ -89,7 +91,7 @@ function drawPerlin3D() {
                             drawSquare(curr+square, curr, curr + square + line, curr + line);
                         }
                         if(k > 0) {
-                            if(meshPoints[i][k-1][j] < threshold || distanceFromCenter(i, k-1, j) >= TERRAIN_SIZE/2) {
+                            if(meshPoints[i][k-1][j] < threshold || (distanceFromCenter(i, k-1, j) >= TERRAIN_SIZE/2 && makeSphere)) {
                                 drawSquare(curr+square+1, curr + 1, curr+square, curr);
                             }
                         } 
@@ -97,20 +99,20 @@ function drawPerlin3D() {
                             drawSquare(curr+square+1, curr + 1, curr+square, curr);
                         }
                         if(j > 0) {
-                            if(meshPoints[i][k][j-1] < threshold || distanceFromCenter(i, k, j-1) >= TERRAIN_SIZE/2) {
+                            if(meshPoints[i][k][j-1] < threshold || (distanceFromCenter(i, k, j-1) >= TERRAIN_SIZE/2 && makeSphere)) {
                                 drawSquare(curr, curr + 1, curr + line, curr + line + 1);
                             }
                         }
                         else {
                             drawSquare(curr, curr + 1, curr + line, curr + line + 1);
                         }
-                        if(meshPoints[i+1][k][j] < threshold || i == size - 1 || distanceFromCenter(i+1, k, j) >= TERRAIN_SIZE/2) {
+                        if(meshPoints[i+1][k][j] < threshold || i == size - 1 || (distanceFromCenter(i+1, k, j) >= TERRAIN_SIZE/2 && makeSphere)) {
                             drawSquare(curr + 1, curr + square + 1, curr + line + 1, curr + square + line + 1)
                         }
-                        if(meshPoints[i][k+1][j] < threshold || k == size - 1 || distanceFromCenter(i, k+1, j) >= TERRAIN_SIZE/2) {
+                        if(meshPoints[i][k+1][j] < threshold || k == size - 1 || (distanceFromCenter(i, k+1, j) >= TERRAIN_SIZE/2 && makeSphere)) {
                             drawSquare(curr + square + line, curr + line, curr + square + line + 1, curr + line + 1)
                         }
-                        if(meshPoints[i][k][j+1] < threshold || j == size - 1 || distanceFromCenter(i, k, j+1) >= TERRAIN_SIZE/2) {
+                        if(meshPoints[i][k][j+1] < threshold || j == size - 1 || (distanceFromCenter(i, k, j+1) >= TERRAIN_SIZE/2 && makeSphere)) {
                             drawSquare(curr + square + 1, curr + square, curr + square + line + 1, curr + square + line)
                         }
                     }
@@ -145,16 +147,24 @@ function drawPerlin3D() {
     }
     createTerrain();
 
-    camera.position.z = TERRAIN_SIZE;
-    camera.position.y = TERRAIN_SIZE;
-    camera.position.x = -TERRAIN_SIZE;
+    camera.position.z = TERRAIN_SIZE*1.2;
+    camera.position.y = TERRAIN_SIZE*1.2;
+    camera.position.x = -TERRAIN_SIZE*1.2;
     camera.lookAt(0, 0, 0);
 
     renderer.render(scene, camera);
+    
+
+
+    // - - - - - - - - - - - - - INPUTS - - - - - - - - - - - - -
+
+    
 
     let seedBox = /** @type {HTMLInputElement} */ (document.getElementById("seedBox"));
     let seedWarning = /** @type {HTMLInputElement} */ (document.getElementById("seedWarning"));
-    let autoAdjustScaleCheck = /** @type {HTMLInputElement} */ (document.getElementById("autoAdjustScaleCheck"));
+
+    let makeSphereCheck = createCheckbox("Make Sphere", makeSphere);
+    let autoAdjustScaleCheck = createCheckbox("Auto Adjust Scale", autoAdjust);
 
     let resolutionSlider = createSlider("Resolution", 0, resOptions.length-1, 1, res);
     let scaleSlider = createSlider("Scale", 0.0001, 0.4, 0.0001, scale);
@@ -176,6 +186,14 @@ function drawPerlin3D() {
             createTerrain();
             seedWarning.innerHTML = "";
         }
+    }
+
+    makeSphereCheck.onclick = () => {
+        makeSphere = makeSphereCheck.checked;
+        createTerrain();
+    }
+    autoAdjustScaleCheck.onclick = () => {
+        autoAdjust = autoAdjustScaleCheck.checked;
     }
 
     resolutionSlider[0].oninput = () => { 

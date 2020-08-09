@@ -12,7 +12,7 @@ const TERRAIN_SIZE = 400;
 
 var seed = 0;
 
-function drawPerlin2DTerrain() {
+function drawPerlin2DTerrainBlocky() {
     seed = (Math.floor(Math.random()*9)+1)*100000000 + Math.floor(Math.random()*99999999);
     let perlinNoiseGenerator = new PerlinNoiseGenerator2D();
     let meshPoints = [];
@@ -82,7 +82,7 @@ function drawPerlin2DTerrain() {
         let ambientLight = new T.AmbientLight(0xffffff, 0.25);
         scene.add(ambientLight);
         let pointLight = new T.PointLight(0xffffff, 1);
-        pointLight.position.set(800, 500, 800);
+        pointLight.position.set(TERRAIN_SIZE * 0.75, 200, 0);
         scene.add(pointLight);
     }
 
@@ -108,14 +108,27 @@ function drawPerlin2DTerrain() {
         terrain.position.z = -TERRAIN_SIZE/2;
         terrain.position.y = -amplitude/2;
         scene.add(terrainGroup);
+
+        // renderer.shadowMap.enabled = true;
+        // renderer.shadowMap.type = T.PCFSoftShadowMap;
+        // scene.children[1].castShadow = true;
+        // terrain.castShadow = true;
+        // terrain.receiveShadow = true;
+
         renderer.render(scene, camera);
     }
     createTerrain();
 
-    camera.position.z = 240;
-    camera.position.y = 320;
-    camera.position.x = -240;
+    camera.position.x = TERRAIN_SIZE * 0.75;
+    camera.position.z = TERRAIN_SIZE * 0.75;
+    camera.position.y = TERRAIN_SIZE * 0.85;
     camera.lookAt(0,-TERRAIN_SIZE*.15,0);
+    
+
+
+    // - - - - - - - - - - - - - INPUTS - - - - - - - - - - - - -
+
+    
 
     let seedBox = /** @type {HTMLInputElement} */ (document.getElementById("seedBox"));
     let seedWarning = /** @type {HTMLInputElement} */ (document.getElementById("seedWarning"));
@@ -197,4 +210,4 @@ function drawPerlin2DTerrain() {
     animate();
 }
 
-onWindowOnload(drawPerlin2DTerrain);
+onWindowOnload(drawPerlin2DTerrainBlocky);

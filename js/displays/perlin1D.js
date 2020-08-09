@@ -69,7 +69,13 @@ let drawNoiseLine = () => {
     }
 
     drawCanvas();
+    
 
+
+    // - - - - - - - - - - - - - INPUTS - - - - - - - - - - - - -
+
+
+    
     let lastSize = numPoints;
 
     let seedBox = /** @type {HTMLInputElement} */ (document.getElementById("seedBox"));

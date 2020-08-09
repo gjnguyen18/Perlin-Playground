@@ -48,6 +48,12 @@ let drawPerlinNoise3DSlices = () => {
     }
 
     drawCanvas();
+    
+
+
+    // - - - - - - - - - - - - - INPUTS - - - - - - - - - - - - -
+
+
 
     let seedBox = /** @type {HTMLInputElement} */ (document.getElementById("seedBox"));
     let seedWarning = /** @type {HTMLInputElement} */ (document.getElementById("seedWarning"));

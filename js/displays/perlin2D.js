@@ -66,6 +66,12 @@ let drawPerlinNoise2D = () => {
 
     drawCanvas();
 
+
+
+    // - - - - - - - - - - - - - INPUTS - - - - - - - - - - - - -
+
+    
+
     let seedBox = /** @type {HTMLInputElement} */ (document.getElementById("seedBox"));
     let seedWarning = /** @type {HTMLInputElement} */ (document.getElementById("seedWarning"));
     let autoAdjustScaleCheck = /** @type {HTMLInputElement} */ (document.getElementById("autoAdjustScaleCheck"));

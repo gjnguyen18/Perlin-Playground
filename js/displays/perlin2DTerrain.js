@@ -15,7 +15,6 @@ var seed = 0;
 function drawPerlin2DTerrain() {
     seed = (Math.floor(Math.random()*9)+1)*100000000 + Math.floor(Math.random()*99999999);
     let perlinNoiseGenerator = new PerlinNoiseGenerator2D(seed);
-    let meshPoints = [];
 
     let canvas = /** @type {HTMLCanvasElement} */ (document.getElementById(
         "terrainPerlin2DCanvas"
@@ -23,25 +22,12 @@ function drawPerlin2DTerrain() {
     let renderer = new T.WebGLRenderer({ canvas: canvas });
     let camera = new T.PerspectiveCamera(50, 1, 0.1, 1000);
     let scene = new T.Scene(); 
-
-    let getPoints = () => {
-        meshPoints = [];
-        for(let i=0; i<size+1; i++) {
-            let column = [];
-            for(let k=0; k<size+1; k++) {
-                let result = perlinNoiseGenerator.getVal(i, k);
-                let val = Math.floor(result * 20) / 20;
-                column.push(result*amplitude);
-            }
-            meshPoints.push(column);
-        }
-    }
   
     let createLights = () => {
         let ambientLight = new T.AmbientLight(0xffffff, 0.25);
         scene.add(ambientLight);
-        let pointLight = new T.PointLight(0xffffff, 1);
-        pointLight.position.set(400, 300, 400);
+        let pointLight = new T.PointLight(0xffffff, 1, 1000);
+        pointLight.position.set(terrainSize * 0.75, 200, 0);
         scene.add(pointLight);
     }
 
@@ -56,14 +42,16 @@ function drawPerlin2DTerrain() {
 
         let geometry = new T.Geometry();
         let material = new T.MeshLambertMaterial({ color: "lightblue" });
-        getPoints();
 
+        // add vertices to geometry
         for(let i=0; i<size+1; i++) {
             for(let k=0; k<size+1; k++) {
-                geometry.vertices.push(new T.Vector3(i*terrainSize/size, meshPoints[i][k], k*terrainSize/size));
+                let result = perlinNoiseGenerator.getVal(i, k) * amplitude;
+                geometry.vertices.push(new T.Vector3(i*terrainSize/size, result, k*terrainSize/size));
             }
         }
 
+        // add faces to geometry
         for(let i=0; i<size; i++) {
             for(let k=0; k<size; k++) {
                 geometry.faces.push(new T.Face3(i*(size+1)+k+1, (i+1)*(size+1)+k+1, i*(size+1)+k));
@@ -80,14 +68,27 @@ function drawPerlin2DTerrain() {
         terrain.position.z = -terrainSize/2;
         terrain.position.y = -amplitude/2;
         scene.add(terrainGroup);
+
+        // renderer.shadowMap.enabled = true;
+        // renderer.shadowMap.type = T.PCFSoftShadowMap;
+        // scene.children[1].castShadow = true;
+        // terrain.castShadow = true;
+        // terrain.receiveShadow = true;
+
         renderer.render(scene, camera);
     }
     createTerrain();
 
-    camera.position.z = 240;
-    camera.position.y = 320;
-    camera.position.x = -240;
+    camera.position.x = terrainSize * 0.75;
+    camera.position.z = terrainSize * 0.75;
+    camera.position.y = terrainSize * 0.85;
     camera.lookAt(0,-terrainSize*.15,0);
+    
+
+
+    // - - - - - - - - - - - - - INPUTS - - - - - - - - - - - - -
+
+
 
     let seedBox = /** @type {HTMLInputElement} */ (document.getElementById("seedBox"));
     let seedWarning = /** @type {HTMLInputElement} */ (document.getElementById("seedWarning"));
