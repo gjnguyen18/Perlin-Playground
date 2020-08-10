@@ -1,5 +1,5 @@
 import * as T from "../../libs/CS559-THREE/build/three.module.js";
-import { onWindowOnload, createSlider } from "../tools/helpers.js";
+import { onWindowOnload, createSlider, createCheckbox } from "../tools/helpers.js";
 import { PerlinNoiseGenerator2D } from "./../noiseGenerators/perlinNoiseGenerator2D.js";
 
 var size = 100;
@@ -8,7 +8,8 @@ var scale = 0.03;
 var octaves = 3;
 var res = 2;
 var resOptions = [25, 50, 100, 200, 400];
-const terrainSize = 400;
+const TERRAIN_SIZE = 400;
+var autoAdjust = true;
 
 var seed = 0;
 
@@ -27,7 +28,7 @@ function drawPerlin2DTerrain() {
         let ambientLight = new T.AmbientLight(0xffffff, 0.25);
         scene.add(ambientLight);
         let pointLight = new T.PointLight(0xffffff, 1, 1000);
-        pointLight.position.set(terrainSize * 0.75, 200, 0);
+        pointLight.position.set(TERRAIN_SIZE * 0.75, 200, 0);
         scene.add(pointLight);
     }
 
@@ -47,7 +48,7 @@ function drawPerlin2DTerrain() {
         for(let i=0; i<size+1; i++) {
             for(let k=0; k<size+1; k++) {
                 let result = perlinNoiseGenerator.getVal(i, k) * amplitude;
-                geometry.vertices.push(new T.Vector3(i*terrainSize/size, result, k*terrainSize/size));
+                geometry.vertices.push(new T.Vector3(i*TERRAIN_SIZE/size, result, k*TERRAIN_SIZE/size));
             }
         }
 
@@ -64,8 +65,8 @@ function drawPerlin2DTerrain() {
         let terrain = new T.Mesh(geometry, material);
         let terrainGroup = new T.Group();
         terrainGroup.add(terrain);
-        terrain.position.x = -terrainSize/2;
-        terrain.position.z = -terrainSize/2;
+        terrain.position.x = -TERRAIN_SIZE/2;
+        terrain.position.z = -TERRAIN_SIZE/2;
         terrain.position.y = -amplitude/2;
         scene.add(terrainGroup);
 
@@ -79,10 +80,10 @@ function drawPerlin2DTerrain() {
     }
     createTerrain();
 
-    camera.position.x = terrainSize * 0.75;
-    camera.position.z = terrainSize * 0.75;
-    camera.position.y = terrainSize * 0.85;
-    camera.lookAt(0,-terrainSize*.15,0);
+    camera.position.x = TERRAIN_SIZE * 0.75;
+    camera.position.z = TERRAIN_SIZE * 0.75;
+    camera.position.y = TERRAIN_SIZE * 0.85;
+    camera.lookAt(0,-TERRAIN_SIZE*.15,0);
     
 
 
@@ -92,7 +93,7 @@ function drawPerlin2DTerrain() {
 
     let seedBox = /** @type {HTMLInputElement} */ (document.getElementById("seedBox"));
     let seedWarning = /** @type {HTMLInputElement} */ (document.getElementById("seedWarning"));
-    let autoAdjustScaleCheck = /** @type {HTMLInputElement} */ (document.getElementById("autoAdjustScaleCheck"));
+    let autoAdjustScaleCheck = createCheckbox("Auto Adjust Scale", autoAdjust);
 
     let resolutionSlider = createSlider("Resolution", 0, resOptions.length-1, 1, res);
     let scaleSlider = createSlider("Scale", 0.0001, 0.4, 0.0001, scale);

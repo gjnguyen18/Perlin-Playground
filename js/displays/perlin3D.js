@@ -205,7 +205,7 @@ function drawPerlin3D() {
     resolutionSlider[0].onchange = () => {
         res = resolutionSlider[0].value;
         size = resOptions[res];
-        if(autoAdjustScaleCheck.checked) {
+        if(autoAdjust) {
             let ratio = size / lastSize;
             let curScale = scaleSlider[0].value;
             scale = curScale / ratio;

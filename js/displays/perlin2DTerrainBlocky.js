@@ -1,5 +1,5 @@
 import * as T from "../../libs/CS559-THREE/build/three.module.js";
-import { onWindowOnload, createSlider } from "../tools/helpers.js";
+import { onWindowOnload, createSlider, createCheckbox } from "../tools/helpers.js";
 import { PerlinNoiseGenerator2D } from "./../noiseGenerators/perlinNoiseGenerator2D.js";
 
 var size = 100;
@@ -8,6 +8,7 @@ var scale = 0.03;
 var octaves = 3;
 var res = 2;
 var resOptions = [25, 50, 100, 200, 400];
+var autoAdjust = true;
 const TERRAIN_SIZE = 400;
 
 var seed = 0;
@@ -23,6 +24,14 @@ function drawPerlin2DTerrainBlocky() {
     let renderer = new T.WebGLRenderer({ canvas: canvas });
     let camera = new T.PerspectiveCamera(50, 1, 0.1, 1000);
     let scene = new T.Scene(); 
+
+    let createLights = () => {
+        let ambientLight = new T.AmbientLight(0xffffff, 0.25);
+        scene.add(ambientLight);
+        let pointLight = new T.PointLight(0xffffff, 1, 1000);
+        pointLight.position.set(TERRAIN_SIZE * 0.75, 200, 0);
+        scene.add(pointLight);
+    }
 
     let getPoints = () => {
         meshPoints = [];
@@ -78,14 +87,6 @@ function drawPerlin2DTerrainBlocky() {
         return geometry;
     }
 
-    let createLights = () => {
-        let ambientLight = new T.AmbientLight(0xffffff, 0.25);
-        scene.add(ambientLight);
-        let pointLight = new T.PointLight(0xffffff, 1);
-        pointLight.position.set(TERRAIN_SIZE * 0.75, 200, 0);
-        scene.add(pointLight);
-    }
-
     let createTerrain = () => {
         perlinNoiseGenerator.setScale(scale);
         perlinNoiseGenerator.setOctaves(octaves);
@@ -109,12 +110,6 @@ function drawPerlin2DTerrainBlocky() {
         terrain.position.y = -amplitude/2;
         scene.add(terrainGroup);
 
-        // renderer.shadowMap.enabled = true;
-        // renderer.shadowMap.type = T.PCFSoftShadowMap;
-        // scene.children[1].castShadow = true;
-        // terrain.castShadow = true;
-        // terrain.receiveShadow = true;
-
         renderer.render(scene, camera);
     }
     createTerrain();
@@ -132,7 +127,7 @@ function drawPerlin2DTerrainBlocky() {
 
     let seedBox = /** @type {HTMLInputElement} */ (document.getElementById("seedBox"));
     let seedWarning = /** @type {HTMLInputElement} */ (document.getElementById("seedWarning"));
-    let autoAdjustScaleCheck = /** @type {HTMLInputElement} */ (document.getElementById("autoAdjustScaleCheck"));
+    let autoAdjustScaleCheck = createCheckbox("Auto Adjust Scale", autoAdjust);
 
     let resolutionSlider = createSlider("Resolution", 0, resOptions.length-1, 1, res);
     let scaleSlider = createSlider("Scale", 0.0001, 0.4, 0.0001, scale);

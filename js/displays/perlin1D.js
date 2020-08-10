@@ -1,4 +1,4 @@
-import { onWindowOnload, createSlider } from "../tools/helpers.js";
+import { onWindowOnload, createSlider, createCheckbox } from "../tools/helpers.js";
 import { NoiseGenerator1D } from "./../noiseGenerators/noiseGenerator1D.js"
 
 var numPoints = 200;
@@ -6,6 +6,7 @@ var amplitude = 200;
 var scale = 0.02;
 var octaves = 3;
 var seed = 0;
+var autoAdjust = true;
 
 let drawNoiseLine = () => {
 
@@ -80,7 +81,7 @@ let drawNoiseLine = () => {
 
     let seedBox = /** @type {HTMLInputElement} */ (document.getElementById("seedBox"));
     let seedWarning = /** @type {HTMLInputElement} */ (document.getElementById("seedWarning"));
-    let autoAdjustScaleCheck = /** @type {HTMLInputElement} */ (document.getElementById("autoAdjustScaleCheck"));
+    let autoAdjustScaleCheck = createCheckbox("Auto Adjust Scale", autoAdjust);
 
     let numPointsSlider = createSlider("Number of Points", 5, 400, 1, numPoints);
     let scaleSlider = createSlider("Scale", 0.0001, 0.4, 0.0001, scale);

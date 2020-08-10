@@ -38,11 +38,20 @@ export class PerlinNoiseGenerator2D {
             return a + diff * step;
         }
 
+        let mod = (x, n) => {
+            return (x % n + n) % n;
+        }
+
         let getRandomValue = (pos) => {
             let index = 0;
             for(let i=0; i<pos.length; i++) {
-                index = this.permutationTable[index + (pos[i] % TABLE_SIZE)];
+                index = this.permutationTable[index + mod(pos[i],TABLE_SIZE)];
             }
+            // if(this.randomValues[index % TABLE_SIZE] == undefined) {
+            //     console.log(pos[0] + " " + pos[1]);
+            //     console.log((pos[0] % TABLE_SIZE) + " " + (pos[1] % TABLE_SIZE));
+            //     console.log("found und");
+            // }
             return this.randomValues[index % TABLE_SIZE];
         }
 
@@ -62,6 +71,10 @@ export class PerlinNoiseGenerator2D {
         for(let i=1; i<=this.octaves; i++) {
             let scaledX = x * this.baseScale * i + Math.pow((this.seed % 10),i);
             let scaledY = y * this.baseScale * i + Math.pow((this.seed % 10),i);
+
+            // if(x < 0 || y < 0) {
+            //     console.log("negative")
+            // }
 
             let xFloor = Math.floor(scaledX);
             let xCeil = Math.ceil(scaledX);

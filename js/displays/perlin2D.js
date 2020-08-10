@@ -1,4 +1,4 @@
-import { onWindowOnload, createSlider } from "../tools/helpers.js";
+import { onWindowOnload, createSlider, createCheckbox } from "../tools/helpers.js";
 import { SimpleNoiseGenerator2D } from "./../noiseGenerators/simpleNoiseGenerator2D.js";
 import { PerlinNoiseGenerator2D } from "./../noiseGenerators/perlinNoiseGenerator2D.js";
 
@@ -9,6 +9,7 @@ var numSteps = 20;
 var seed = 0;
 var res = 2;
 var resOptions = [25, 50, 100, 200, 400];
+var autoAdjust = true;
 
 let drawPerlinNoise2D = () => {
 
@@ -74,7 +75,7 @@ let drawPerlinNoise2D = () => {
 
     let seedBox = /** @type {HTMLInputElement} */ (document.getElementById("seedBox"));
     let seedWarning = /** @type {HTMLInputElement} */ (document.getElementById("seedWarning"));
-    let autoAdjustScaleCheck = /** @type {HTMLInputElement} */ (document.getElementById("autoAdjustScaleCheck"));
+    let autoAdjustScaleCheck = createCheckbox("Auto Adjust Scale", autoAdjust);
 
     let resolutionSlider = createSlider("Resolution", 0, resOptions.length-1, 1, res);
     let scaleSlider = createSlider("Scale", 0.0001, 1, 0.0001, scale);

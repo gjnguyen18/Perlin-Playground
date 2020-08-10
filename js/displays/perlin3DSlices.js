@@ -9,6 +9,7 @@ var seed = 0;
 var numSteps = 30;
 var res = 2;
 var resOptions = [25, 50, 100, 200, 400];
+var autoAdjust = true;
 
 let drawPerlinNoise3DSlices = () => {
     seed = (Math.floor(Math.random()*9)+1)*100000000 + Math.floor(Math.random()*99999999);
@@ -57,7 +58,7 @@ let drawPerlinNoise3DSlices = () => {
 
     let seedBox = /** @type {HTMLInputElement} */ (document.getElementById("seedBox"));
     let seedWarning = /** @type {HTMLInputElement} */ (document.getElementById("seedWarning"));
-    let autoAdjustScaleCheck = /** @type {HTMLInputElement} */ (document.getElementById("autoAdjustScaleCheck"));
+    let autoAdjustScaleCheck = createCheckbox("Auto Adjust Scale", autoAdjust);
 
     let resolutionSlider = createSlider("Resolution", 0, resOptions.length-1, 1, res);
     let scaleSlider = createSlider("Scale", 0.0001, 0.4, 0.0001, scale);
