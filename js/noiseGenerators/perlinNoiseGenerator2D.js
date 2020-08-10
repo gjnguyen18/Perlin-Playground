@@ -1,4 +1,5 @@
 import * as Random from "../tools/random.js";
+import * as Vector from "../tools/vectors.js"
 
 const TABLE_SIZE = 1024;
 export class PerlinNoiseGenerator2D {
@@ -32,61 +33,44 @@ export class PerlinNoiseGenerator2D {
     setOctaves(x) { this.octaves = x; }
 
     getVal(x, y) {
+        // quintic smoothstep function
         let smoothStep = (a, b, t) => {
             let step = t * t * t * (10 - 15 * t + 6 * t * t)
             let diff = b - a;
             return a + diff * step;
         }
 
-        let mod = (x, n) => {
+        // created mod function since % doesn't work properly with negatives
+        let mod = (x, n) => { 
             return (x % n + n) % n;
         }
 
+        // retrieves random angle from table of angles by using a permutation table
         let getRandomValue = (pos) => {
             let index = 0;
             for(let i=0; i<pos.length; i++) {
                 index = this.permutationTable[index + mod(pos[i],TABLE_SIZE)];
             }
-            // if(this.randomValues[index % TABLE_SIZE] == undefined) {
-            //     console.log(pos[0] + " " + pos[1]);
-            //     console.log((pos[0] % TABLE_SIZE) + " " + (pos[1] % TABLE_SIZE));
-            //     console.log("found und");
-            // }
             return this.randomValues[index % TABLE_SIZE];
-        }
-
-        let dot = (v1, v2) => {
-            if(v1.length != v2.length) {
-                return null;
-            }
-            let result = 0;
-            for(let i=0; i<v1.length; i++) {
-                result += v1[i] * v2[i];
-            }
-            return result;
         }
 
         let result = 0;
         let max = 0;
-        for(let i=1; i<=this.octaves; i++) {
-            let scaledX = x * this.baseScale * i + Math.pow((this.seed % 10),i);
-            let scaledY = y * this.baseScale * i + Math.pow((this.seed % 10),i);
-
-            // if(x < 0 || y < 0) {
-            //     console.log("negative")
-            // }
+        for(let i=0; i<this.octaves; i++) {
+            let scaledX = x * this.baseScale * Math.pow(2, i) + Math.pow((this.seed % 10),i);
+            let scaledY = y * this.baseScale * Math.pow(2, i) + Math.pow((this.seed % 10),i);
 
             let xFloor = Math.floor(scaledX);
             let xCeil = Math.ceil(scaledX);
             let yFloor = Math.floor(scaledY);
             let yCeil = Math.ceil(scaledY);
 
-            let v1 = dot(getRandomValue([xFloor, yFloor]), [scaledX-xFloor, scaledY-yFloor]);
-            let v2 = dot(getRandomValue([xCeil, yFloor]), [scaledX-xCeil, scaledY-yFloor]);
-            let v3 = dot(getRandomValue([xFloor, yCeil]), [scaledX-xFloor, scaledY-yCeil]);
-            let v4 = dot(getRandomValue([xCeil, yCeil]), [scaledX-xCeil, scaledY-yCeil]);
+            let v1 = Vector.dot(getRandomValue([xFloor, yFloor]), [scaledX-xFloor, scaledY-yFloor]);
+            let v2 = Vector.dot(getRandomValue([xCeil, yFloor]), [scaledX-xCeil, scaledY-yFloor]);
+            let v3 = Vector.dot(getRandomValue([xFloor, yCeil]), [scaledX-xFloor, scaledY-yCeil]);
+            let v4 = Vector.dot(getRandomValue([xCeil, yCeil]), [scaledX-xCeil, scaledY-yCeil]);
 
-            // bilinear interpolation
+            // interpolation using smoothstep
             let tx = scaledX - xFloor;
             let ty = scaledY - yFloor;
             let xVal1 = smoothStep(v1, v2, tx);
@@ -94,8 +78,8 @@ export class PerlinNoiseGenerator2D {
 
             let yVal = smoothStep(xVal1, xVal2, ty);
             let finalVal = (yVal + 1) / 2;
-            result += finalVal / Math.pow(2,i-1);
-            max += 1 / Math.pow(2,i-1);
+            result += finalVal / Math.pow(2,i);
+            max += 1 / Math.pow(2,i);
         }
         return result / max;
     } 

@@ -40,14 +40,14 @@ export class NoiseGenerator1D {
 
         let result = 0;
         let max = 0;
-        for(let i=1; i<=this.octaves; i++) {
-            let scaledX = x * this.baseScale * i + + Math.pow((this.seed % 10),i);
+        for(let i=0; i<this.octaves; i++) {
+            let scaledX = x * this.baseScale * Math.pow(2, i) + + Math.pow((this.seed % 10),i);
             let xFloor = Math.floor(scaledX);
             let xCeil = Math.ceil(scaledX);
             let t = scaledX - xFloor;
             let val = smoothStep(getRandomValue(xFloor), getRandomValue(xCeil), t);
-            result += val / Math.pow(2, i-1);
-            max += 1 / Math.pow(2,i-1);
+            result += val / Math.pow(2, i);
+            max += 1 / Math.pow(2,i);
         }
         return result / max;
     }

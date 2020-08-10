@@ -40,10 +40,15 @@ export class PerlinNoiseGenerator3D {
             return a + diff * step;
         }
 
+        // created mod function since % doesn't work properly with negatives
+        let mod = (x, n) => { 
+            return (x % n + n) % n;
+        }
+
         let getRandomValue = (pos) => {
             let index = 0;
             for(let i=0; i<pos.length; i++) {
-                index = this.permutationTable[index + (pos[i] % TABLE_SIZE)];
+                index = this.permutationTable[index + mod(pos[i], TABLE_SIZE)];
             }
             return this.randomValues[index % TABLE_SIZE];
         }
@@ -61,10 +66,10 @@ export class PerlinNoiseGenerator3D {
 
         let result = 0;
         let max = 0;
-        for(let i=1; i<=this.octaves; i++) {
-            let scaledX = x * this.baseScale * i + Math.pow((this.seed % 17),i);
-            let scaledY = y * this.baseScale * i + Math.pow((this.seed % 17),i);
-            let scaledZ = z * this.baseScale * i + Math.pow((this.seed % 17),i);
+        for(let i=0; i<this.octaves; i++) {
+            let scaledX = x * this.baseScale * Math.pow(2, i) + Math.pow((this.seed % 17),i);
+            let scaledY = y * this.baseScale * Math.pow(2, i) + Math.pow((this.seed % 17),i);
+            let scaledZ = z * this.baseScale * Math.pow(2, i) + Math.pow((this.seed % 17),i);
 
             let xFloor = Math.floor(scaledX);
             let xCeil = Math.ceil(scaledX);
@@ -99,8 +104,8 @@ export class PerlinNoiseGenerator3D {
             let zVal = smoothStep(yVal1, yVal2, tz);
 
             let finalVal = (zVal + 1) / 2;
-            result += finalVal / Math.pow(2,i-1);
-            max += 1 / Math.pow(2,i-1);
+            result += finalVal / Math.pow(2,i);
+            max += 1 / Math.pow(2,i);
         }
         return result / max;
     } 
