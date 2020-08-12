@@ -67,9 +67,9 @@ export class PerlinNoiseGenerator3D {
         let result = 0;
         let max = 0;
         for(let i=0; i<this.octaves; i++) {
-            let scaledX = x * this.baseScale * Math.pow(2, i) + Math.pow((this.seed % 17),i);
-            let scaledY = y * this.baseScale * Math.pow(2, i) + Math.pow((this.seed % 17),i);
-            let scaledZ = z * this.baseScale * Math.pow(2, i) + Math.pow((this.seed % 17),i);
+            let scaledX = x * this.baseScale * Math.pow(2, i) + (this.seed % (5 + i*13)) * (i+7);
+            let scaledY = y * this.baseScale * Math.pow(2, i) + (this.seed % (5 + i*13)) * (i+7);
+            let scaledZ = z * this.baseScale * Math.pow(2, i) + (this.seed % (5 + i*13)) * (i+7);
 
             let xFloor = Math.floor(scaledX);
             let xCeil = Math.ceil(scaledX);

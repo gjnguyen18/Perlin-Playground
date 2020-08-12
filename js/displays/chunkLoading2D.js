@@ -1,20 +1,18 @@
 import { onWindowOnload, createSlider, createCheckbox } from "../tools/helpers.js";
 import { PerlinNoiseGenerator2D } from "../noiseGenerators/perlinNoiseGenerator2D.js";
-import { fillMarchingSquare } from "../tools/marchingSquaresHelper.js";
 
 var size = 50;
 var scale = 0.06;
 var octaves = 3;
-// var numSteps = 2;
 var seed = 0;
 var res = 2;
-var threshold = 0.5;
 var interpolatePoints = true;
 var autoAdjust = true;
 var resOptions = [10, 25, 50, 100, 200, 400];
-var chunkSize = 5;
+var chunkSize = 10;
 var moveSpeed = 1;
-var chunkRange = 5;
+var addChunkRange = 4;
+var deleteChunkRange = 6;
 
 let drawChunkLoad2D = () => {
 
@@ -30,17 +28,8 @@ let drawChunkLoad2D = () => {
 
     var playerPosition = [0, 0];
 
-    // let drawGrid = () => {
-    //     context.fillStyle = "Green";
-    //     for(let i=1; i<length; i+=chunkSize*length/size) {
-    //         context.fillRect(i-1, 0, 2, length);
-    //         context.fillRect(0, i-1, length, 2);
-    //     }
-    // }
-
     let drawPlayer = () => {
         context.beginPath();
-        // context.arc(playerPosition[0]+length/2, playerPosition[1]+height/2, 3, 0, Math.PI*2);
         context.arc(length/2, height/2, 3, 0, Math.PI*2);
         context.fillStyle = "Red";
         context.fill();
@@ -51,16 +40,36 @@ let drawChunkLoad2D = () => {
         return [Math.floor( (size/length) * playerPosition[0]/chunkSize),  Math.floor((size/height) * playerPosition[1]/chunkSize)];
     }
 
-    let getNearbyChunks = (currChunk, range) => {
-        let nearChunks = [];
-        for(let i=currChunk[0]-range; i<=currChunk[0]+range; i++) {
-            for(let k=currChunk[1]-range; k<=currChunk[1]+range; k++) {
-                if(Math.sqrt((currChunk[0] - i) * (currChunk[0] - i) + (currChunk[1] - k) * (currChunk[1] - k)) <= range) {
-                    nearChunks.push([i, k]);
+    let updateChunks = (currChunk, closeRange, farRange, chunkMap) => {
+        for(let i=currChunk[0]-closeRange; i<=currChunk[0]+closeRange; i++) {
+            for(let k=currChunk[1]-closeRange; k<=currChunk[1]+closeRange; k++) {
+                let distanceToPlayerChunk = Math.sqrt((currChunk[0] - i) * (currChunk[0] - i) + (currChunk[1] - k) * (currChunk[1] - k));
+                if(distanceToPlayerChunk < closeRange && !chunkMap.has([i, k].toString())) {
+                    chunkMap.set([i, k].toString(), [i, k]);
                 }
             }
         }
-        return nearChunks;
+        chunkMap.forEach(function(value, key) {
+            let distanceToPlayerChunk = Math.sqrt((currChunk[0] - value[0]) * (currChunk[0] - value[0]) + (currChunk[1] - value[1]) * (currChunk[1] - value[1]));
+            if(distanceToPlayerChunk > farRange) {
+                chunkMap.delete(value.toString());
+            }
+        })
+    }
+
+    let drawSquare = (x, y, val) => {
+        let color = "#";
+        for(let i=0; i<3; i++) {
+            let grey = (Math.floor(val * 255)).toString(16);
+            if(grey.length==1) {
+                color += "0" + grey;
+            }
+            else {
+                color += grey;
+            }
+        }
+        context.fillStyle = color;       
+        context.fillRect(x, y, length/size, height/size);
     }
 
     let drawChunk = (x, y) => {
@@ -69,24 +78,13 @@ let drawChunkLoad2D = () => {
         context.fillRect(x*chunkSize*spacing-playerPosition[0]+length/2, y*chunkSize*spacing-playerPosition[1]+length/2, chunkSize * spacing, chunkSize * spacing);
         for(let i=x*chunkSize; i<x*chunkSize+chunkSize; i++) {
             for(let k=y*chunkSize; k<y*chunkSize+chunkSize; k++) {
-                if(i == undefined || k == undefined) {
-                    console.log("found undef")
-                }
-                let values = [
-                    perlinNoiseGenerator.getVal(i, k),
-                    perlinNoiseGenerator.getVal(i+1, k),
-                    perlinNoiseGenerator.getVal(i+1, k+1),
-                    perlinNoiseGenerator.getVal(i, k+1)
-                ]
-                fillMarchingSquare(i*spacing-playerPosition[0]+length/2, k*spacing-playerPosition[1]+length/2, spacing, values, threshold, interpolatePoints, "White", context);
-                // context.beginPath();
-                // context.arc(i*spacing, k*spacing, 1, 0 , Math.PI*2);
-                // context.fillStyle = "blue";
-                // context.fill();
+                let result = perlinNoiseGenerator.getVal(i, k);
+                drawSquare(i*spacing-playerPosition[0]+length/2, k*spacing-playerPosition[1]+length/2, result);
             }
         }
     }
 
+    let nearChunks = new Map();
     let drawCanvas = () => {
         perlinNoiseGenerator.setScale(scale);
         perlinNoiseGenerator.setOctaves(octaves);
@@ -94,33 +92,11 @@ let drawChunkLoad2D = () => {
         context.fillStyle = "Black";
         context.fillRect(0, 0, length*2, height);
 
-        // let spacing = length/size;
-        // for(let i=0; i<size+1; i++) {
-        //     for(let k=0; k<size+1; k++) {
-        //         let values = [
-        //             perlinNoiseGenerator.getVal(i, k),
-        //             perlinNoiseGenerator.getVal(i+1, k),
-        //             perlinNoiseGenerator.getVal(i+1, k+1),
-        //             perlinNoiseGenerator.getVal(i, k+1)
-        //         ]
-        //         fillMarchingSquare(i*spacing-playerPosition[0], k*spacing-playerPosition[1], spacing, values, threshold, interpolatePoints, "White", context);
-        //         // context.beginPath();
-        //         // context.arc(i*spacing, k*spacing, 1, 0 , Math.PI*2);
-        //         // context.fillStyle = "blue";
-        //         // context.fill();
-        //     }
-        // }
         let playerChunk = getPlayerChunk();
-        let nearChunks = getNearbyChunks(playerChunk, chunkRange);
-        // nearChunks.forEach(chunk => {
-        //     drawChunk(chunk[0], chunk[1]);
-        // });
-        // console.log(playerChunk);
-        for(let i=0; i<nearChunks.length; i++) {
-            drawChunk(nearChunks[i][0], nearChunks[i][1]);
-        }
-
-        // drawGrid();
+        updateChunks(playerChunk, addChunkRange, deleteChunkRange, nearChunks);
+        nearChunks.forEach(function(value, key) {
+            drawChunk(value[0], value[1]);
+        });
         drawPlayer();
     }
 
@@ -173,7 +149,6 @@ let drawChunkLoad2D = () => {
     let resolutionSlider = createSlider("Number of Points", 0, resOptions.length-1, 1, res);
     let scaleSlider = createSlider("Scale", 0.0001, 1, 0.0001, scale);
     let octavesSlider = createSlider("Octaves", 1, 10, 1, octaves);
-    let thresholdSlider = createSlider("Threshold", 0, 1, 0.001, threshold);
 
     let lastSize = size;
 
@@ -236,26 +211,17 @@ let drawChunkLoad2D = () => {
         drawCanvas();
     }
 
-    thresholdSlider[0].oninput = () => {
-        thresholdSlider[1].innerHTML = "Threshold: " + thresholdSlider[0].value;
-        threshold = thresholdSlider[0].value;
-        drawCanvas();
-    }
-    // thresholdSlider[0].onchange = () => {
-    //     threshold = thresholdSlider[0].value;
-    //     drawCanvas();
-    // }
     let lastPos = [playerPosition[0], playerPosition[1]];
     function animate() {
-       movePlayer();
-       if(lastPos[0] != playerPosition[0] || lastPos[1] != playerPosition[1]) {
-           drawCanvas();
-           lastPos[0] = playerPosition[0];
-           lastPos[1] = playerPosition[1];
-           let curChunk = getPlayerChunk();
-        //    console.log(curChunk[0] + " " + curChunk[1]);
-       }
-       requestAnimationFrame(animate);
+        // console.time("frame");
+        movePlayer();
+        if(lastPos[0] != playerPosition[0] || lastPos[1] != playerPosition[1]) {
+            drawCanvas();
+            lastPos[0] = playerPosition[0];
+            lastPos[1] = playerPosition[1];
+        }
+        // console.timeEnd("frame");
+        requestAnimationFrame(animate);
     }
     animate();
 };

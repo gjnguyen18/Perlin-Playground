@@ -1,3 +1,5 @@
+// table from http://paulbourke.net/geometry/polygonise/
+
 import * as T from "../../libs/CS559-THREE/build/three.module.js";
 import { triTable, edgeTable, edgeCorners } from "../tools/marchingCubesTables.js";
 
@@ -41,6 +43,7 @@ export function fillMarchingCube(x, y, z, blockSize, values, threshold, interpol
         return;
     }
 
+    // find out which edges are used from edge table
     let edge = edgeTable[cubeIndex];
     let edgeNums = [];
     for(let i=0; i<12; i++) {
@@ -50,17 +53,18 @@ export function fillMarchingCube(x, y, z, blockSize, values, threshold, interpol
         }
     }
 
+    // get the points corresponding to the edges found
     let edgePoints = [];
     for(let i=0; i<edgeNums.length; i++) {
-        let edgeCorner = edgeCorners[edgeNums[i]];
-        let p1 = corners[edgeCorner[0]];
-        let p2 = corners[edgeCorner[1]];
+        let edgeCorner = edgeCorners[edgeNums[i]]; // the numbers of the two corners of the edge
+        let p1 = corners[edgeCorner[0]]; // corner 1
+        let p2 = corners[edgeCorner[1]]; // corner 2
 
         let pointNum = 0;
 
         let hashCords = [[p1[0]+x, p1[1]+y, p1[2]+z], [p2[0]+x, p2[1]+y, p2[2]+z]].toString();
-        let mappedPoint = geometryVertices.get(hashCords);
-        if(mappedPoint == undefined) {
+        let mappedPoint = geometryVertices.get(hashCords); // find the edge vertex in the map
+        if(mappedPoint == undefined) { // if doesn't exist, create the edge vertex and add it
             let func = interpolatePoints ? getMidPointLerp : getMidPoint;
             let point = func(p1, p2, threshold);
             pointNum = geometryVertices.size;
@@ -76,7 +80,7 @@ export function fillMarchingCube(x, y, z, blockSize, values, threshold, interpol
         edgePoints.push(pointNum);
     }
 
-    let facePoints = triTable[cubeIndex];
+    let facePoints = triTable[cubeIndex]; // order of edges points to draw faces
 
     for(let i=0; i<facePoints.length; i+=3) {
         geometry.faces.push(new T.Face3(
