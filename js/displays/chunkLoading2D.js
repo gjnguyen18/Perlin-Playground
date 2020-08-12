@@ -51,7 +51,7 @@ let drawChunkLoad2D = () => {
         }
         chunkMap.forEach(function(value, key) {
             let distanceToPlayerChunk = Math.sqrt((currChunk[0] - value[0]) * (currChunk[0] - value[0]) + (currChunk[1] - value[1]) * (currChunk[1] - value[1]));
-            if(distanceToPlayerChunk > farRange) {
+            if(distanceToPlayerChunk >= farRange) {
                 chunkMap.delete(value.toString());
             }
         })

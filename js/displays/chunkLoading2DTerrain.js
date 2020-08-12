@@ -1,15 +1,21 @@
 import * as T from "../../libs/CS559-THREE/build/three.module.js";
+import { OrbitControls } from "../../libs/CS559-THREE/examples/jsm/controls/OrbitControls.js";
 import { onWindowOnload, createSlider, createCheckbox } from "../tools/helpers.js";
 import { PerlinNoiseGenerator2D } from "../noiseGenerators/perlinNoiseGenerator2D.js";
 
 var size = 100;
 var amplitude = 500;
-var scale = 0.03;
-var octaves = 3;
+var scale = 0.014;
+var octaves = 7;
 var res = 2;
 var resOptions = [25, 50, 100, 200, 400];
-const TERRAIN_SIZE = 400;
+var chunkSize = 16;
+var spaceBetweenVertices = 2;
 var autoAdjust = true;
+var addChunkRange = 8;
+var deleteChunkRange = 12;
+var moveSpeed = 4;
+let cameraDistance = 400;
 
 var seed = 0;
 
@@ -18,66 +24,108 @@ function drawPerlin2DTerrain() {
     let perlinNoiseGenerator = new PerlinNoiseGenerator2D(seed);
 
     var playerPosition = [0, 0];
+    var nearChunks = new Map();
+    var prevNearChunks = new Map();
 
     let canvas = /** @type {HTMLCanvasElement} */ (document.getElementById(
         "chunkLoading2DTerrainCanvas"
     ));
     let renderer = new T.WebGLRenderer({ canvas: canvas });
-    let camera = new T.PerspectiveCamera(50, 1, 0.1, 1000);
+    let camera = new T.PerspectiveCamera(50, 1, 0.1, 2000);
     let scene = new T.Scene(); 
 
-    let getPlayerChunk = () => {
-        let spacing = length/size;
-        return [
-            Math.floor((size/length) * playerPosition[0]/chunkSize),  
-            Math.floor((size/height) * playerPosition[1]/chunkSize)];
-    }
-  
-    let createLights = () => {
-        let ambientLight = new T.AmbientLight(0xffffff, 0.25);
-        scene.add(ambientLight);
-        let pointLight = new T.PointLight(0xffffff, 1, 1000);
-        pointLight.position.set(TERRAIN_SIZE * 0.75, 200, 0);
-        scene.add(pointLight);
-    }
+    // createLights
+    let ambientLight = new T.AmbientLight(0xffffff, 0.25);
+    scene.add(ambientLight);
+    let pointLight = new T.PointLight(0xffffff, 1, 2000);
+    pointLight.position.set(chunkSize * spaceBetweenVertices * 0.75, 200, 0);
+    scene.add(pointLight);
 
-    let createTerrain = () => {
-        perlinNoiseGenerator.setScale(scale);
-        perlinNoiseGenerator.setOctaves(octaves);
-
-        while(scene.children.length > 0){ 
-            scene.remove(scene.children[0]); 
-        }
-        createLights();
-
+    let createChunkMesh = (x, y) => {
         let geometry = new T.Geometry();
         let material = new T.MeshLambertMaterial({ color: "lightblue" });
 
         // add vertices to geometry
-        for(let i=0; i<size+1; i++) {
-            for(let k=0; k<size+1; k++) {
+        for(let i = x * chunkSize; i < x * chunkSize + chunkSize + 1; i++) {
+            for(let k = y * chunkSize; k < y * chunkSize + chunkSize + 1; k++) {
                 let result = perlinNoiseGenerator.getVal(i, k) * amplitude;
-                geometry.vertices.push(new T.Vector3(i*TERRAIN_SIZE/size, result, k*TERRAIN_SIZE/size));
+                geometry.vertices.push(new T.Vector3(i*spaceBetweenVertices, result, k*spaceBetweenVertices));
             }
         }
 
         // add faces to geometry
-        for(let i=0; i<size; i++) {
-            for(let k=0; k<size; k++) {
-                geometry.faces.push(new T.Face3(i*(size+1)+k+1, (i+1)*(size+1)+k+1, i*(size+1)+k));
-                geometry.faces.push(new T.Face3((i+1)*(size+1)+k+1, (i+1)*(size+1)+k, i*(size+1)+k));
+        for(let i=0; i<chunkSize; i++) {
+            for(let k=0; k<chunkSize; k++) {
+                geometry.faces.push(new T.Face3(i*(chunkSize+1)+k+1, (i+1)*(chunkSize+1)+k+1, i*(chunkSize+1)+k));
+                geometry.faces.push(new T.Face3((i+1)*(chunkSize+1)+k+1, (i+1)*(chunkSize+1)+k, i*(chunkSize+1)+k));
             }
         }
 
+        // console.log(geometry);
         geometry.computeFaceNormals();
 
         let terrain = new T.Mesh(geometry, material);
-        let terrainGroup = new T.Group();
-        terrainGroup.add(terrain);
-        terrain.position.x = -TERRAIN_SIZE/2;
-        terrain.position.z = -TERRAIN_SIZE/2;
-        terrain.position.y = -amplitude/2;
-        scene.add(terrainGroup);
+        // let terrainGroup = new T.Group();
+        // terrainGroup.add(terrain);
+        // terrain.position.x = -TERRAIN_SIZE/2;
+        // terrain.position.z = -TERRAIN_SIZE/2;
+        // terrain.position.y = -amplitude/2;
+        return terrain;
+    }
+
+    // let terrainGroup = new T.Group();
+    // scene.add(terrainGroup);
+    // let terrainMeshes = new Map();
+
+    let getPlayerChunk = () => {
+        let spacing = length/size;
+        return [
+            Math.floor(playerPosition[0]/(spaceBetweenVertices*chunkSize)),  
+            Math.floor(playerPosition[1]/(spaceBetweenVertices*chunkSize))
+        ];
+    }
+
+    let updateChunks = (currChunk, closeRange, farRange) => {
+        for(let i=currChunk[0]-closeRange; i<=currChunk[0]+closeRange; i++) {
+            for(let k=currChunk[1]-closeRange; k<=currChunk[1]+closeRange; k++) {
+                let distanceToPlayerChunk = Math.sqrt((currChunk[0] - i) * (currChunk[0] - i) + (currChunk[1] - k) * (currChunk[1] - k));
+                if(distanceToPlayerChunk < closeRange && !nearChunks.has([i, k].toString())) {
+                    nearChunks.set([i, k].toString(), [i, k]);
+                }
+            }
+        }
+        nearChunks.forEach(function(value, key) {
+            let distanceToPlayerChunk = Math.sqrt((currChunk[0] - value[0]) * (currChunk[0] - value[0]) + (currChunk[1] - value[1]) * (currChunk[1] - value[1]));
+            if(distanceToPlayerChunk >= farRange) {
+                nearChunks.delete(value.toString());
+                // terrainGroup.remove(terrainGroup.children[prevNearChunks.get(value.toString())]);
+                let mesh = prevNearChunks.get(value.toString());
+                scene.remove(mesh);
+                prevNearChunks.delete(value.toString());
+            }
+        })
+    }
+
+    let updateTerrain = () => {
+        perlinNoiseGenerator.setScale(scale);
+        perlinNoiseGenerator.setOctaves(octaves);
+
+        let playerChunk = getPlayerChunk();
+        updateChunks(playerChunk, addChunkRange, deleteChunkRange, nearChunks);
+        nearChunks.forEach(function(value, key) {
+            if(!prevNearChunks.has(key)) {
+                let mesh = createChunkMesh(value[0], value[1]);
+                prevNearChunks.set(key, mesh);
+                // console.log(terrainGroup.children.length);
+                // terrainMeshes.add(mesh)
+                scene.add(mesh);
+            }
+        });
+
+        // scene.add(mesh);
+
+        // terrainGroup.position.x = chunkSize*2.5;
+        // terrainGroup.position.z = -chunkSize*20;
 
         // renderer.shadowMap.enabled = true;
         // renderer.shadowMap.type = T.PCFSoftShadowMap;
@@ -85,15 +133,48 @@ function drawPerlin2DTerrain() {
         // terrain.castShadow = true;
         // terrain.receiveShadow = true;
 
-        renderer.render(scene, camera);
+        // renderer.render(scene, camera);
     }
-    createTerrain();
 
-    camera.position.x = TERRAIN_SIZE * 0.75;
-    camera.position.z = TERRAIN_SIZE * 0.75;
-    camera.position.y = TERRAIN_SIZE * 0.85;
-    camera.lookAt(0,-TERRAIN_SIZE*.15,0);
+    let updateCamera = () => {
+        camera.position.set(playerPosition[0], cameraDistance*1.5, playerPosition[1] + cameraDistance*1.2);
+        pointLight.position.set(playerPosition[0] + cameraDistance * 1.2, cameraDistance * .6, playerPosition[1] + cameraDistance * 1.2);
+        camera.lookAt(playerPosition[0], 200, playerPosition[1]);
+    }
+    // let controls = new OrbitControls(camera, renderer.domElement);
     
+    
+
+    // - - - - - - - - - - - - - KEYBOARD INPUTS - - - - - - - - -
+
+
+
+    let keyMap = new Map();
+    let activateKey = (e) => {
+        keyMap.set(e.key, true)
+        // movePlayer();
+    }
+    let deactivateKey = (e) => {
+        keyMap.set(e.key, false)
+    }
+    document.addEventListener('keydown', activateKey);
+    document.addEventListener('keyup', deactivateKey);
+
+    let movePlayer = () => {
+        if(keyMap.get("w")) {
+            playerPosition[1] -= moveSpeed;
+        }
+        if(keyMap.get("s")) {
+            playerPosition[1] += moveSpeed;
+        }
+        if(keyMap.get("a")) {
+            playerPosition[0] -= moveSpeed;
+        }
+        if(keyMap.get("d")) {
+            playerPosition[0] += moveSpeed;
+        }
+    }
+
 
 
     // - - - - - - - - - - - - - INPUTS - - - - - - - - - - - - -
@@ -102,14 +183,6 @@ function drawPerlin2DTerrain() {
 
     let seedBox = /** @type {HTMLInputElement} */ (document.getElementById("seedBox"));
     let seedWarning = /** @type {HTMLInputElement} */ (document.getElementById("seedWarning"));
-    let autoAdjustScaleCheck = createCheckbox("Auto Adjust Scale", autoAdjust);
-
-    let resolutionSlider = createSlider("Resolution", 0, resOptions.length-1, 1, res);
-    let scaleSlider = createSlider("Scale", 0.0001, 0.4, 0.0001, scale);
-    let octavesSlider = createSlider("Octaves", 1, 10, 1, octaves);
-    let amplitudeSlider = createSlider("Amplitude", 0, 800, 1, amplitude);
-
-    let lastSize = size;
 
     seedBox.value = seed;
     seedBox.onchange = () => {
@@ -126,55 +199,11 @@ function drawPerlin2DTerrain() {
         }
     }
 
-    resolutionSlider[0].oninput = () => {
-        res = resolutionSlider[0].value;
-        size = resOptions[res];
-        resolutionSlider[1].innerHTML = "Resolution: " + size + " x " + size;
-    }
-    resolutionSlider[1].innerHTML = "Resolution: " + size + " x " + size;
-    resolutionSlider[0].onchange = () => {
-        res = resolutionSlider[0].value;
-        size = resOptions[res];
-        if(autoAdjustScaleCheck.checked) {
-            let ratio = size / lastSize;
-            let curScale = scaleSlider[0].value;
-            scale = curScale / ratio;
-            scaleSlider[0].value = scale;
-            scaleSlider[1].innerHTML = "Scale: " + scale;
-        }
-        lastSize = size;
-        createTerrain();
-    }
-
-    scaleSlider[0].oninput = () => {
-        scaleSlider[1].innerHTML = "Scale: " + scaleSlider[0].value;
-    }
-    scaleSlider[0].onchange = () => {
-        scale = scaleSlider[0].value;
-        createTerrain();
-    }
-
-    octavesSlider[0].oninput = () => {
-        octavesSlider[1].innerHTML = "Octaves: " + octavesSlider[0].value;
-    }
-    octavesSlider[0].onchange = () => {
-        octaves = octavesSlider[0].value;
-        createTerrain();
-    }
-    
-    amplitudeSlider[0].oninput = () => {
-        amplitudeSlider[1].innerHTML = "Amplitude: " + amplitudeSlider[0].value;
-    }
-    amplitudeSlider[0].onchange = () => {
-        amplitude = amplitudeSlider[0].value;
-        createTerrain();
-    }
-  
-    let terrainRotation = 0;
     function animate() {
         requestAnimationFrame(animate);
-        terrainRotation += 0.001;
-        scene.children[2].rotation.y = terrainRotation;
+        movePlayer();
+        updateTerrain();
+        updateCamera();
         renderer.render(scene, camera);
     }
     animate();
