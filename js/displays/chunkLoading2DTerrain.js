@@ -12,6 +12,7 @@ var addChunkRange = 8;
 var deleteChunkRange = 12;
 var moveSpeed = 4;
 let cameraDistance = 400;
+var chunksToLoadPerFrame = 10;
 
 var seed = 0;
 
@@ -22,6 +23,7 @@ function drawPerlin2DTerrain() {
     var playerPosition = [0, 0];
     var nearChunks = new Map();
     var prevNearChunks = new Map();
+    var chunkQueue = [];
 
     let canvas = /** @type {HTMLCanvasElement} */ (document.getElementById(
         "chunkLoading2DTerrainCanvas"
@@ -93,15 +95,33 @@ function drawPerlin2DTerrain() {
         updateChunks(playerChunk);
         nearChunks.forEach(function(value, key) {
             if(!prevNearChunks.has(key)) {
-                let mesh = createChunkMesh(value[0], value[1], chunkSize);
-                prevNearChunks.set(key, mesh);
-                scene.add(mesh);
+                chunkQueue.push(value);
+                // let mesh = createChunkMesh(value[0], value[1], chunkSize);
+                // prevNearChunks.set(key, mesh);
+                // scene.add(mesh);
+                prevNearChunks.set(key, value);
             }
         });
+        for(let i=0; i<chunksToLoadPerFrame; i++) {
+            if(chunkQueue.length > 0) {
+                let value = chunkQueue.shift();
+                if(nearChunks.has(value.toString())) {
+                    let mesh = createChunkMesh(value[0], value[1], chunkSize);
+                    prevNearChunks.set(value.toString(), mesh);
+                    scene.add(mesh);
+                } else {
+                    i--;
+                }
+            }
+            else {
+                i = chunksToLoadPerFrame;
+            }
+        }
     }
 
     let clearTerrain = () => {
         nearChunks.forEach(function(value, key) {
+            chunkQueue = [];
             let mesh = prevNearChunks.get(value.toString());
             scene.remove(mesh);
             nearChunks.delete(value.toString());
@@ -167,6 +187,7 @@ function drawPerlin2DTerrain() {
     let spaceBetweenVerticesSlider = createSlider("Space Between Vertices", 1, 20, 1, spaceBetweenVertices);
     let chunkSizeSlider = createSlider("Chunk Size", 1, 40, 1, chunkSize);
     let chunkRangeSlider = createSlider("Chunk Range", 2, 32, 1, addChunkRange);
+    let chunksToLoadPerFrameSlider = createSlider("Chunks Loaded per Frame", 1, 50, 1, chunksToLoadPerFrame);
     let scaleSlider = createSlider("Scale", 0.0001, 0.4, 0.0001, scale);
     let octavesSlider = createSlider("Octaves", 1, 10, 1, octaves);
     let amplitudeSlider = createSlider("Amplitude", 0, 800, 1, amplitude);
@@ -214,6 +235,14 @@ function drawPerlin2DTerrain() {
         addChunkRange = Number(chunkRangeSlider[0].value);
         deleteChunkRange = addChunkRange + 4;
         recreateTerrain();
+    }
+
+    chunksToLoadPerFrameSlider[0].oninput = () => {
+        chunksToLoadPerFrameSlider[1].innerHTML = "Chunks Loaded per Frame: " + chunksToLoadPerFrameSlider[0].value;
+    }
+    chunksToLoadPerFrameSlider[0].onchange = () => {
+        chunksToLoadPerFrame = Number(chunksToLoadPerFrameSlider[0].value);
+        // recreateTerrain();
     }
 
     scaleSlider[0].oninput = () => {
