@@ -46,12 +46,20 @@ export class PerlinNoiseGenerator2D {
         }
 
         // retrieves random angle from table of angles by using a permutation table
+        // let getRandomValue = (pos) => {
+        //     let index = 0;
+        //     for(let i=0; i<pos.length; i++) {
+        //         index = this.permutationTable[index + mod(pos[i],TABLE_SIZE)];
+        //     }
+        //     return this.randomValues[index % TABLE_SIZE];
+        // }
+
         let getRandomValue = (pos) => {
             let index = 0;
             for(let i=0; i<pos.length; i++) {
-                index = this.permutationTable[index + mod(pos[i],TABLE_SIZE)];
+                index = this.permutationTable[index + (pos[i] & (TABLE_SIZE-1))];
             }
-            return this.randomValues[index % TABLE_SIZE];
+            return this.randomValues[index & (TABLE_SIZE-1)];
         }
 
         let result = 0;

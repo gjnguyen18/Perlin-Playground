@@ -41,16 +41,24 @@ export class PerlinNoiseGenerator3D {
         }
 
         // created mod function since % doesn't work properly with negatives
-        let mod = (x, n) => { 
-            return (x % n + n) % n;
-        }
+        // let mod = (x, n) => { 
+        //     return (x % n + n) % n;
+        // }
+
+        // let getRandomValue = (pos) => {
+        //     let index = 0;
+        //     for(let i=0; i<pos.length; i++) {
+        //         index = this.permutationTable[index + mod(pos[i], TABLE_SIZE)];
+        //     }
+        //     return this.randomValues[index % TABLE_SIZE];
+        // }
 
         let getRandomValue = (pos) => {
             let index = 0;
             for(let i=0; i<pos.length; i++) {
-                index = this.permutationTable[index + mod(pos[i], TABLE_SIZE)];
+                index = this.permutationTable[index + (pos[i] & (TABLE_SIZE-1))];
             }
-            return this.randomValues[index % TABLE_SIZE];
+            return this.randomValues[index & (TABLE_SIZE-1)];
         }
 
         let dot = (v1, v2) => {

@@ -15,9 +15,9 @@ var spaceBetweenVertices = 0.005;
 var addChunkRange = 5;
 var deleteChunkRange = 6;
 var moveSpeed = 0.001;
-var chunksToLoadPerFrame = 1;
+var chunksToLoadPerFrame = 2;
 
-let cameraDistance = 400;
+let cameraDistance = 1;
 
 const TERRAIN_SIZE = 800;
 
@@ -32,6 +32,7 @@ function drawMarchingCubesTerrain() {
     var nearChunks = new Map();
     var prevNearChunks = new Map();
     var chunkQueue = [];
+    var chunkUnloadQueue = [];
 
     let canvas = /** @type {HTMLCanvasElement} */ (document.getElementById(
         "chunkLoading3DCanvas"
@@ -49,7 +50,7 @@ function drawMarchingCubesTerrain() {
 
     let fogColor = "#000000";
     scene.background = new T.Color(fogColor);
-    scene.fog = new T.Fog(fogColor, chunkSize * spaceBetweenVertices * (addChunkRange-3), chunkSize * spaceBetweenVertices * (addChunkRange+1));
+    scene.fog = new T.Fog(fogColor, chunkSize * spaceBetweenVertices * (addChunkRange-2), chunkSize * spaceBetweenVertices * (addChunkRange+1.5));
     // scene.fog = new T.FogExp2("0xFFFFFF", 0.05);
 
     let getPlayerChunk = () => {
@@ -163,22 +164,54 @@ function drawMarchingCubesTerrain() {
         let geometryVertices = new Map();
 
         let meshPoints = [];
+        // for(let i=0; i<chunkSize+1; i++) {
+        //     let column = [];
+        //     for(let k=0; k<chunkSize+1; k++) {
+        //         let row = [];
+        //         for(let j=0; j<chunkSize+1; j++) {
+        //             let result = perlinNoiseGenerator.getVal(x * chunkSize + i, y * chunkSize + k, z * chunkSize + j);
+        //             row.push(result);
+        //         }
+        //         column.push(row);
+        //     }
+        //     meshPoints.push(column);
+        // }
+
+        // i-k face
         for(let i=0; i<chunkSize+1; i++) {
             let column = [];
             for(let k=0; k<chunkSize+1; k++) {
-                let row = [];
-                for(let j=0; j<chunkSize+1; j++) {
-                    let result = perlinNoiseGenerator.getVal(x * chunkSize + i, y * chunkSize + k, z * chunkSize + j);
-                    row.push(result);
-                }
+                let result = perlinNoiseGenerator.getVal(x * chunkSize + i, y * chunkSize + k, z * chunkSize + 0);
+                let row = [result];
                 column.push(row);
             }
             meshPoints.push(column);
         }
 
+        // i-j face
+        for(let i=0; i<chunkSize+1; i++) {
+            let row = meshPoints[i][0];
+            for(let j=1; j<chunkSize+1; j++) {
+                let result = perlinNoiseGenerator.getVal(x * chunkSize + i, y * chunkSize + 0, z * chunkSize + j);
+                row.push(result);
+            }
+        }
+
+        // k-j face
+        for(let k=1; k<chunkSize+1; k++) {
+            for(let j=1; j<chunkSize+1; j++) {
+                let result = perlinNoiseGenerator.getVal(x * chunkSize + 0, y * chunkSize + k, z * chunkSize + j);
+                meshPoints[0][k].push(result);
+            }
+        }
+
+
+
         for(let i = 0; i < chunkSize; i++) {
             for(let k = 0; k < chunkSize; k++) {
                 for(let j = 0; j < chunkSize; j++) {
+                    let result = perlinNoiseGenerator.getVal(x * chunkSize + i + 1, y * chunkSize + k + 1, z * chunkSize + j + 1);
+                    meshPoints[i+1][k+1].push(result);
 
                     let v0 = meshPoints[i][k][j];
                     let v1 = meshPoints[i+1][k][j];
@@ -224,7 +257,8 @@ function drawMarchingCubesTerrain() {
             if(distanceToPlayerChunk >= deleteChunkRange) {
                 nearChunks.delete(value.toString());
                 let mesh = prevNearChunks.get(value.toString());
-                scene.remove(mesh);
+                chunkUnloadQueue.push(mesh);
+                // scene.remove(mesh);
                 prevNearChunks.delete(value.toString());
             }
         })
@@ -252,6 +286,18 @@ function drawMarchingCubesTerrain() {
             }
             else {
                 i = chunksToLoadPerFrame;
+            }
+        }
+
+        for(let i=0; i<chunksToLoadPerFrame*2; i++) {
+            if(chunkUnloadQueue.length > 0) {
+                let mesh = chunkUnloadQueue.shift();
+                mesh.geometry.dispose();
+                mesh.material.dispose();
+                scene.remove(mesh);
+            }
+            else {
+                i = chunksToLoadPerFrame*2;
             }
         }
     }
