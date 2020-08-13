@@ -10,7 +10,7 @@ var interpolatePoints = true;
 var autoAdjust = true;
 var resOptions = [10, 25, 50, 100, 200, 400];
 var chunkSize = 10;
-var moveSpeed = 1;
+var moveSpeed = 4;
 var addChunkRange = 4;
 var deleteChunkRange = 6;
 

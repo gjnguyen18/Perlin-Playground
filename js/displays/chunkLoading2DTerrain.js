@@ -1,5 +1,4 @@
 import * as T from "../../libs/CS559-THREE/build/three.module.js";
-import { OrbitControls } from "../../libs/CS559-THREE/examples/jsm/controls/OrbitControls.js";
 import { onWindowOnload, createSlider, createCheckbox } from "../tools/helpers.js";
 import { PerlinNoiseGenerator2D } from "../noiseGenerators/perlinNoiseGenerator2D.js";
 
@@ -96,9 +95,6 @@ function drawPerlin2DTerrain() {
         nearChunks.forEach(function(value, key) {
             if(!prevNearChunks.has(key)) {
                 chunkQueue.push(value);
-                // let mesh = createChunkMesh(value[0], value[1], chunkSize);
-                // prevNearChunks.set(key, mesh);
-                // scene.add(mesh);
                 prevNearChunks.set(key, value);
             }
         });
